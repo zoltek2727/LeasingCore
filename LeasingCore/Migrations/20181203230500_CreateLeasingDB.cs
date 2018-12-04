@@ -14,18 +14,11 @@ namespace LeasingCore.Migrations
                 {
                     CategoryId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CategoryName = table.Column<string>(maxLength: 30, nullable: false),
-                    CategoryId1 = table.Column<int>(nullable: true)
+                    CategoryName = table.Column<string>(maxLength: 30, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.CategoryId);
-                    table.ForeignKey(
-                        name: "FK_Categories_Categories_CategoryId1",
-                        column: x => x.CategoryId1,
-                        principalTable: "Categories",
-                        principalColumn: "CategoryId",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -298,11 +291,6 @@ namespace LeasingCore.Migrations
                         principalColumn: "ParamId",
                         onDelete: ReferentialAction.Restrict);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Categories_CategoryId1",
-                table: "Categories",
-                column: "CategoryId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LeasingDetailParams_LeasingDetailId",
