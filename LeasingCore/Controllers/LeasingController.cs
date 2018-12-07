@@ -15,7 +15,7 @@ namespace LeasingCore.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await dbContext.Products.ToListAsync());
+            return View(await dbContext.Products.Include(p => p.Category).ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
