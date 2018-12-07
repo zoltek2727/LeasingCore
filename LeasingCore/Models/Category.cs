@@ -14,6 +14,6 @@ namespace LeasingCore.Models
         [MaxLength(30, ErrorMessage = "CategoryName must be 30 characters or less"), MinLength(2)]
         public string CategoryName { get; set; }
 
-        public ICollection<Category> Categorys { get; set; }
+        public ICollection<Product> Products { get; set; }
     }
 }
