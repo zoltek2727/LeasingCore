@@ -25,15 +25,11 @@ namespace LeasingCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("CategoryId1");
-
                     b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasMaxLength(30);
 
                     b.HasKey("CategoryId");
-
-                    b.HasIndex("CategoryId1");
 
                     b.ToTable("Categories");
                 });
@@ -300,13 +296,6 @@ namespace LeasingCore.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("LeasingCore.Models.Category", b =>
-                {
-                    b.HasOne("LeasingCore.Models.Category")
-                        .WithMany("Categorys")
-                        .HasForeignKey("CategoryId1");
-                });
-
             modelBuilder.Entity("LeasingCore.Models.Leasing", b =>
                 {
                     b.HasOne("LeasingCore.Models.Product", "Product")
@@ -360,7 +349,7 @@ namespace LeasingCore.Migrations
             modelBuilder.Entity("LeasingCore.Models.Product", b =>
                 {
                     b.HasOne("LeasingCore.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
