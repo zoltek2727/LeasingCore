@@ -1,0 +1,52 @@
+﻿@model LeasingCore.Models.Leasing
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Leasing</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.LeasingStart)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LeasingStart)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LeasingEnd)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LeasingEnd)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LeasingExtend)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LeasingExtend)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.User)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.User.UserId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Product)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Product.ProductCode)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="LeasingId" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

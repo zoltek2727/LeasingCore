@@ -9,13 +9,23 @@ using LeasingCore.Models;
 
 namespace LeasingCore.Controllers
 {
-    public class LeasingController : Controller
+    public class ProductsController : Controller
     {
         LeasingContext dbContext = new LeasingContext();
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string SearchString)
         {
-            return View(await dbContext.Products.Include(p => p.Category).ToListAsync());
+            var products = from p in dbContext.Products
+                           select p;
+
+            if (!String.IsNullOrEmpty(SearchString))
+            {
+                products = products.Where(p=>p.ProductName.Contains(SearchString));
+            }
+
+            return View(await products.Include(p=>p.Category).ToListAsync());
+
+            //return View(await dbContext.Products.Include(p => p.Category).ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -25,7 +35,7 @@ namespace LeasingCore.Controllers
                 return NotFound();
             }
 
-            var products = await dbContext.Products
+            var products = await dbContext.ProductParams.Include(p => p.Param).Include(p => p.Product).Include(c=>c.Product.Category)
                 .SingleOrDefaultAsync(p => p.ProductId == id);
             if (products == null)
             {
@@ -42,7 +52,7 @@ namespace LeasingCore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,CompanyId")] Product products)
+        public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,CategoryId")] Product products)
         {
             if (ModelState.IsValid)
             {
@@ -70,7 +80,7 @@ namespace LeasingCore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,CompanyId")] Product products)
+        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,CategoryId")] Product products)
         {
             if (id != products.ProductId)
             {

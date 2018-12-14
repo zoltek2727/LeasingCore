@@ -1,0 +1,49 @@
+﻿@model LeasingCore.Models.Leasing
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Leasing</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.LeasingStart)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LeasingStart)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LeasingEnd)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LeasingEnd)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LeasingExtend)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LeasingExtend)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.User)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.User.UserId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Product)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Product.ProductCode)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.LeasingId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
