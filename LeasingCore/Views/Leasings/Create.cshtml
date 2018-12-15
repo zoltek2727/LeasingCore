@@ -14,13 +14,8 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="LeasingStart" class="control-label"></label>
-                <input asp-for="LeasingStart" class="form-control" />
-                <span asp-validation-for="LeasingStart" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="LeasingEnd" class="control-label"></label>
-                <input asp-for="LeasingEnd" class="form-control" />
+                <input type="text" id="fromDate" class="datepicker" />
                 <span asp-validation-for="LeasingEnd" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -29,14 +24,6 @@
                         <input asp-for="LeasingExtend" /> @Html.DisplayNameFor(model => model.LeasingExtend)
                     </label>
                 </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductId" class="control-label"></label>
-                <select asp-for="ProductId" class ="form-control" asp-items="ViewBag.ProductId"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
@@ -48,4 +35,3 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
-

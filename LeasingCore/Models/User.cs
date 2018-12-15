@@ -10,7 +10,7 @@ namespace LeasingCore.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         [Required]
         [MaxLength(30, ErrorMessage = "UserName must be 30 characters or less"), MinLength(2)]
         public string UserName { get; set; }

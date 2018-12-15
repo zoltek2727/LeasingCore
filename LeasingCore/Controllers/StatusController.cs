@@ -9,18 +9,22 @@ using LeasingCore.Models;
 
 namespace LeasingCore.Controllers
 {
-    public class LeasingsController : Controller
+    public class StatusController : Controller
     {
-        LeasingContext _context = new LeasingContext();
+        private readonly LeasingContext _context;
 
-        // GET: Leasings
-        public async Task<IActionResult> Index()
+        public StatusController(LeasingContext context)
         {
-            var leasingContext = _context.Leasings.Include(l => l.User);
-            return View(await leasingContext.ToListAsync());
+            _context = context;
         }
 
-        // GET: Leasings/Details/5
+        // GET: Status
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.Statuses.ToListAsync());
+        }
+
+        // GET: Status/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -28,42 +32,39 @@ namespace LeasingCore.Controllers
                 return NotFound();
             }
 
-            var leasing = await _context.Leasings
-                .Include(l => l.User)
-                .FirstOrDefaultAsync(m => m.LeasingId == id);
-            if (leasing == null)
+            var status = await _context.Statuses
+                .FirstOrDefaultAsync(m => m.StatusId == id);
+            if (status == null)
             {
                 return NotFound();
             }
 
-            return View(leasing);
+            return View(status);
         }
 
-        // GET: Leasings/Create
+        // GET: Status/Create
         public IActionResult Create()
         {
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "UserId");
             return View();
         }
 
-        // POST: Leasings/Create
+        // POST: Status/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LeasingId,LeasingStart,LeasingEnd,LeasingExtend,UserId")] Leasing leasing)
+        public async Task<IActionResult> Create([Bind("StatusId,StatusName")] Status status)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(leasing);
+                _context.Add(status);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "UserId", leasing.UserId);
-            return View(leasing);
+            return View(status);
         }
 
-        // GET: Leasings/Edit/5
+        // GET: Status/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -71,23 +72,22 @@ namespace LeasingCore.Controllers
                 return NotFound();
             }
 
-            var leasing = await _context.Leasings.FindAsync(id);
-            if (leasing == null)
+            var status = await _context.Statuses.FindAsync(id);
+            if (status == null)
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "UserId", leasing.UserId);
-            return View(leasing);
+            return View(status);
         }
 
-        // POST: Leasings/Edit/5
+        // POST: Status/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LeasingId,LeasingStart,LeasingEnd,LeasingExtend,UserId")] Leasing leasing)
+        public async Task<IActionResult> Edit(int id, [Bind("StatusId,StatusName")] Status status)
         {
-            if (id != leasing.LeasingId)
+            if (id != status.StatusId)
             {
                 return NotFound();
             }
@@ -96,12 +96,12 @@ namespace LeasingCore.Controllers
             {
                 try
                 {
-                    _context.Update(leasing);
+                    _context.Update(status);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LeasingExists(leasing.LeasingId))
+                    if (!StatusExists(status.StatusId))
                     {
                         return NotFound();
                     }
@@ -112,11 +112,10 @@ namespace LeasingCore.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "UserId", leasing.UserId);
-            return View(leasing);
+            return View(status);
         }
 
-        // GET: Leasings/Delete/5
+        // GET: Status/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,31 +123,30 @@ namespace LeasingCore.Controllers
                 return NotFound();
             }
 
-            var leasing = await _context.Leasings
-                .Include(l => l.User)
-                .FirstOrDefaultAsync(m => m.LeasingId == id);
-            if (leasing == null)
+            var status = await _context.Statuses
+                .FirstOrDefaultAsync(m => m.StatusId == id);
+            if (status == null)
             {
                 return NotFound();
             }
 
-            return View(leasing);
+            return View(status);
         }
 
-        // POST: Leasings/Delete/5
+        // POST: Status/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var leasing = await _context.Leasings.FindAsync(id);
-            _context.Leasings.Remove(leasing);
+            var status = await _context.Statuses.FindAsync(id);
+            _context.Statuses.Remove(status);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool LeasingExists(int id)
+        private bool StatusExists(int id)
         {
-            return _context.Leasings.Any(e => e.LeasingId == id);
+            return _context.Statuses.Any(e => e.StatusId == id);
         }
     }
 }

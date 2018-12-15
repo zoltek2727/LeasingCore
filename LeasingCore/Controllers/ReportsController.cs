@@ -16,7 +16,7 @@ namespace LeasingCore.Controllers
         // GET: Reports
         public async Task<IActionResult> Index()
         {
-            var leasingContext = _context.Reports.Include(r => r.Leasing).Include(r => r.Status);
+            var leasingContext = _context.Reports.Include(r => r.Leasing).Include(r=>r.Leasing.LeasingDetails).Include(r => r.Status);
             return View(await leasingContext.ToListAsync());
         }
 

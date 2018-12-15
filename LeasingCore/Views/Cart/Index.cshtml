@@ -1,6 +1,4 @@
-﻿@model IEnumerable<LeasingCore.Models.Product>
-
-@{
+﻿@{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -11,47 +9,67 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ProductName)
+                Action
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ProductPrice)
+                Id
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ProductAvailability)
+                Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ProductCode)
+                Price
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                Available
             </th>
-            <th></th>
+            <th>
+                Code
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                Sub Total
+            </th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in ViewBag.cart)
+        {
+            <tr>
+                <td><a asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">Remove</a></td>
+                <td>
+                    @item.Product.ProductId
+                </td>
+                <td>
+                    @item.Product.ProductName
+                </td>
+                <td>
+                    @item.Product.ProductPrice
+                </td>
+                <td>
+                    @item.Product.ProductAvailability
+                </td>
+                <td>
+                    @item.Product.ProductCode
+                </td>
+                <td>
+                    @item.Quantity
+                </td>
+                <td>
+                    @(item.Product.ProductPrice * item.Quantity)
+                </td>
+            </tr>
+        }
         <tr>
+            <td align="right" colspan="7">Sum</td>
             <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductAvailability)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
+                @ViewBag.total
             </td>
         </tr>
-}
     </tbody>
 </table>
+<br>
+<a asp-controller="Products" asp-action="Index">Continue Shopping</a>
+<a asp-controller="Cart" asp-action="Leasing">Leasing</a>

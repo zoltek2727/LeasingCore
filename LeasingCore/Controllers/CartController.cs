@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using Microsoft.AspNetCore.Authorization;
+using LeasingCore.Helpers;
 
 namespace LeasingCore.Controllers
 {
@@ -23,117 +24,97 @@ namespace LeasingCore.Controllers
 
         // GET: Cart
         [Authorize]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var leasingContext = _context.Products.Include(p => p.Category);
-            return View(await leasingContext.ToListAsync());
+            var cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
+            ViewBag.cart = cart;
+            ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
+            return View();
+
+            //var leasingContext = _context.Products.Include(p => p.Category);
+            //return View(await leasingContext.ToListAsync());
         }
 
-        // GET: Cart/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [Route("buy/{id}")]
+        public IActionResult Buy(int id)
         {
-            if (id == null)
+            Product productModel = new Product();
+            if (SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart") == null)
             {
-                return NotFound();
+                var cart = new List<ShoppingCart>();
+                cart.Add(new ShoppingCart() { Product = _context.Products.Find(id), Quantity = 1 });
+                SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
             }
-
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
+            else
             {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        // GET: Cart/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
-            return View(product);
-        }
-
-        // POST: Cart/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,CategoryId")] Product product)
-        {
-            if (id != product.ProductId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
+                int index = isExist(id);
+                if (index != -1)
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    cart[index].Quantity++;
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!ProductExists(product.ProductId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    cart.Add(new ShoppingCart() { Product = _context.Products.Find(id), Quantity = 1 });
                 }
-                return RedirectToAction(nameof(Index));
+                SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
-            return View(product);
+            return RedirectToAction("Index");
         }
 
-        // GET: Cart/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [Route("remove/{id}")]
+        public IActionResult Remove(int id)
         {
-            if (id == null)
+            List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
+            int index = isExist(id);
+            cart.RemoveAt(index);
+            SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Leasing()
+        {
+            List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
+
+            Leasing l = new Leasing
             {
-                return NotFound();
-            }
+                LeasingStart = DateTime.Now,
+                LeasingEnd = DateTime.MaxValue,
+                LeasingExtend = true,
+                UserId = 1
+            };
+            _context.Add(l);
 
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
+            LeasingDetail ld;
+            foreach (var item in cart)
             {
-                return NotFound();
+                ld = new LeasingDetail
+                {
+                    LeasingId = l.LeasingId,
+                    LeasingDetailAmount = item.Quantity,
+                    ProductId = item.Product.ProductId
+                };
+                _context.Add(ld);
             }
+            _context.SaveChanges();
 
-            return View(product);
+            cart = null;
+            SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
+
+            return RedirectToAction("Index", "HomeController");
         }
 
-        // POST: Cart/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        private int isExist(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.ProductId == id);
+            List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
+            for (int i = 0; i < cart.Count; i++)
+            {
+                if (cart[i].Product.ProductId.Equals(id))
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 }
