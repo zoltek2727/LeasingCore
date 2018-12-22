@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Action
+            </th>
+            <th>
+                Id
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                Available
+            </th>
+            <th>
+                Code
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                Sub Total
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in ViewBag.cart)
+        {
+            <tr>
+                <td><a asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">Remove</a></td>
+                <td>
+                    @item.Product.ProductId
+                </td>
+                <td>
+                    @item.Product.ProductName
+                </td>
+                <td>
+                    @item.Product.ProductPrice
+                </td>
+                <td>
+                    @item.Product.ProductAvailability
+                </td>
+                <td>
+                    @item.Product.ProductCode
+                </td>
+                <td>
+                    @item.Quantity
+                </td>
+                <td>
+                    @(item.Product.ProductPrice * item.Quantity)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td align="right" colspan="7">Sum</td>
+            <td>
+                @ViewBag.total
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<a asp-controller="Products" asp-action="Index">Continue Shopping</a>
+<a asp-controller="Cart" asp-action="Leasing">Leasing</a>
