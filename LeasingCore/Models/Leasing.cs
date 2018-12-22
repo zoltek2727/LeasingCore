@@ -22,10 +22,6 @@ namespace LeasingCore.Models
         [ForeignKey("UserId")]
         public User User { get; set; }
 
-        public int ProductId { get; set; }
-        [ForeignKey("ProductId")]
-        public Product Product { get; set; }
-
         public ICollection<Report> Reports { get; set; }
         public ICollection<LeasingDetail> LeasingDetails { get; set; }
     }

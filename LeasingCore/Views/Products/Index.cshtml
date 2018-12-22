@@ -1,0 +1,93 @@
+﻿@model ReflectionIT.Mvc.Paging.PagingList<LeasingCore.Models.Product>
+@using ReflectionIT.Mvc.Paging
+@addTagHelper *, ReflectionIT.Mvc.Paging
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Panel</h2>
+
+<nav aria-label="Suppliers navigation example">
+    @await this.Component.InvokeAsync("Pager", new { pagingList = this.Model })
+</nav>
+
+<p>
+    <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Create")'">Create New</button>
+</p>
+
+<form method="get" class="form-inline">
+    <input name="filter" class="form-control" placeholder="filter"
+           value="@Model.RouteValue["Filter"]" />
+    <button type="submit" class="btn btn-info">
+        <span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search
+    </button>
+</form>
+
+@*<form asp-controller="Products" asp-action="Index">
+        <p>
+            Product Name: <input type="text" name="SearchString">
+            <input type="submit" class="btn-primary" value="Filter" />
+        </p>
+    </form>*@
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.SortableHeaderFor(model => model.ProductId)
+            </th>
+            <th>
+                @Html.SortableHeaderFor(model => model.ProductName)
+            </th>
+            <th>
+                @Html.SortableHeaderFor(model => model.ProductPrice)
+            </th>
+            <th>
+                @Html.SortableHeaderFor(model => model.ProductAvailability)
+            </th>
+            <th>
+                @Html.SortableHeaderFor(model => model.ProductCode)
+            </th>
+            <th>
+                @Html.SortableHeaderFor(model => model.Category.CategoryName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductAvailability)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.CategoryName)
+            </td>
+            <td>
+                <a asp-controller="Cart" asp-action="Buy" asp-route-id="@item.ProductId">Buy Now</a>
+                <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<nav aria-label="Suppliers navigation example">
+    <vc:pager paging-list="@Model" />
+</nav>

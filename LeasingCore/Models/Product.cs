@@ -24,7 +24,6 @@ namespace LeasingCore.Models
         [ForeignKey("CategoryId")]
         public Category Category { get; set; }
 
-        public ICollection<Leasing> Leasings { get; set; }
         public ICollection<LeasingDetail> LeasingDetails { get; set; }
         public ICollection<ProductParam> ProductParams { get; set; }
     }
