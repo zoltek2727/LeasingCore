@@ -101,7 +101,7 @@ namespace LeasingCore.Controllers
             cart = null;
             SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
 
-            return RedirectToAction("Index", "HomeController");
+            return Redirect(Url.Content("~/"));
         }
 
         private int isExist(int id)
