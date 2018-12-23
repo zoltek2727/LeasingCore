@@ -35,41 +35,47 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in ViewBag.cart)
+        @if (ViewBag.cart != null)
         {
+            @foreach (var item in ViewBag.cart)
+            {
+                <tr>
+                    <td><a asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">Remove</a></td>
+                    <td>
+                        @item.Product.ProductId
+                    </td>
+                    <td>
+                        @item.Product.ProductName
+                    </td>
+                    <td>
+                        @item.Product.ProductPrice
+                    </td>
+                    <td>
+                        @item.Product.ProductAvailability
+                    </td>
+                    <td>
+                        @item.Product.ProductCode
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @(item.Product.ProductPrice * item.Quantity)
+                    </td>
+                </tr>
+            }
+
             <tr>
-                <td><a asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">Remove</a></td>
+                <td align="right" colspan="7">Sum</td>
                 <td>
-                    @item.Product.ProductId
-                </td>
-                <td>
-                    @item.Product.ProductName
-                </td>
-                <td>
-                    @item.Product.ProductPrice
-                </td>
-                <td>
-                    @item.Product.ProductAvailability
-                </td>
-                <td>
-                    @item.Product.ProductCode
-                </td>
-                <td>
-                    @item.Quantity
-                </td>
-                <td>
-                    @(item.Product.ProductPrice * item.Quantity)
+                    @ViewBag.total
                 </td>
             </tr>
         }
-        <tr>
-            <td align="right" colspan="7">Sum</td>
-            <td>
-                @ViewBag.total
-            </td>
-        </tr>
+        
     </tbody>
 </table>
+<p class="text-danger">@ViewBag.ErrorMessage</p>
 <br>
 <a asp-controller="Products" asp-action="Index">Continue Shopping</a>
 <a asp-controller="Cart" asp-action="Leasing">Leasing</a>

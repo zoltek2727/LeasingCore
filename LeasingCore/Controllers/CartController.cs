@@ -28,7 +28,11 @@ namespace LeasingCore.Controllers
         {
             var cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
             ViewBag.cart = cart;
-            ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
+            if (cart != null)
+            {
+                ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
+                return View();
+            }
             return View();
 
             //var leasingContext = _context.Products.Include(p => p.Category);
@@ -75,33 +79,41 @@ namespace LeasingCore.Controllers
         public IActionResult Leasing()
         {
             List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
-
-            Leasing l = new Leasing
+            if (cart != null)
             {
-                LeasingStart = DateTime.Now,
-                LeasingEnd = DateTime.MaxValue,
-                LeasingExtend = true,
-                UserId = 1
-            };
-            _context.Add(l);
-
-            LeasingDetail ld;
-            foreach (var item in cart)
-            {
-                ld = new LeasingDetail
+                Leasing l = new Leasing
                 {
-                    LeasingId = l.LeasingId,
-                    LeasingDetailAmount = item.Quantity,
-                    ProductId = item.Product.ProductId
+                    LeasingStart = DateTime.Now,
+                    LeasingEnd = DateTime.MaxValue,
+                    LeasingExtend = true,
+                    UserId = 1
                 };
-                _context.Add(ld);
+                _context.Add(l);
+
+                LeasingDetail ld;
+
+                foreach (var item in cart)
+                {
+                    ld = new LeasingDetail
+                    {
+                        LeasingId = l.LeasingId,
+                        LeasingDetailAmount = item.Quantity,
+                        ProductId = item.Product.ProductId
+                    };
+                    _context.Add(ld);
+                }
+                _context.SaveChanges();
+
+                cart = null;
+                SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
+
+                return RedirectToAction("Index", "HomeController");
             }
-            _context.SaveChanges();
-
-            cart = null;
-            SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
-
-            return RedirectToAction("Index", "HomeController");
+            else
+                ViewBag.ErrorMessage = "Koszyk nie może być pusty";
+                return View("Index");
+            
+            
         }
 
         private int isExist(int id)
