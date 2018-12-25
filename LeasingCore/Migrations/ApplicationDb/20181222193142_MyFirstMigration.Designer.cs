@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LeasingCore.Migrations.ApplicationDb
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(LeasingContext))]
     [Migration("20181222193142_MyFirstMigration")]
     partial class MyFirstMigration
     {

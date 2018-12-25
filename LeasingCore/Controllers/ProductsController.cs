@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LeasingCore.Controllers
 {
@@ -15,6 +16,7 @@ namespace LeasingCore.Controllers
     {
         LeasingContext _context = new LeasingContext();
 
+        [Authorize]
         public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "ProductName")
         {
             //var products = from p in dbContext.Products
