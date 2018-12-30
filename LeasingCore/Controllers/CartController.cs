@@ -79,8 +79,8 @@ namespace LeasingCore.Controllers
         public IActionResult Leasing()
         {
             List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
-            if (cart != null)
-            {
+
+            
                 Leasing l = new Leasing
                 {
                     LeasingStart = DateTime.Now,
@@ -117,10 +117,7 @@ namespace LeasingCore.Controllers
                 SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
 
                 return RedirectToAction("Index", "HomeController");
-            }
-            else
-                ViewBag.ErrorMessage = "Your cart can't be empty";
-                return View("Index");
+
             
             
         }
