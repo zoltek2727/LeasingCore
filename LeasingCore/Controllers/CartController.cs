@@ -28,7 +28,15 @@ namespace LeasingCore.Controllers
         {
             var cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
             ViewBag.cart = cart;
-            ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
+
+            if (cart != null)
+            {
+                ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
+                return View();
+            }
+
+
+
             return View();
 
             //var leasingContext = _context.Products.Include(p => p.Category);
@@ -76,32 +84,48 @@ namespace LeasingCore.Controllers
         {
             List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
 
-            Leasing l = new Leasing
-            {
-                LeasingStart = DateTime.Now,
-                LeasingEnd = DateTime.MaxValue,
-                LeasingExtend = true,
-                UserId = 1
-            };
-            _context.Add(l);
 
-            LeasingDetail ld;
-            foreach (var item in cart)
-            {
-                ld = new LeasingDetail
+            
+                Leasing l = new Leasing
                 {
-                    LeasingId = l.LeasingId,
-                    LeasingDetailAmount = item.Quantity,
-                    ProductId = item.Product.ProductId
+                    LeasingStart = DateTime.Now,
+                    LeasingEnd = DateTime.MaxValue,
+                    LeasingExtend = true,
+                    UserId = 1
                 };
-                _context.Add(ld);
-            }
-            _context.SaveChanges();
+                _context.Add(l);
 
-            cart = null;
-            SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
+                LeasingDetail ld;
 
-            return Redirect(Url.Content("~/"));
+                foreach (var item in cart)
+                {
+                    ld = new LeasingDetail
+                    {
+                        LeasingId = l.LeasingId,
+                        LeasingDetailAmount = item.Quantity,
+                        ProductId = item.Product.ProductId
+                    };
+                    _context.Add(ld);
+                }
+                try
+                {
+                    _context.SaveChanges();
+                }
+                catch
+                {
+                    ViewBag.ErrorMessage = "Your cart can't be empty";
+                    return View("Index");
+                }
+                
+                
+                cart = null;
+                SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
+
+                return RedirectToAction("Index", "HomeController");
+
+            
+            
+
         }
 
         private int isExist(int id)

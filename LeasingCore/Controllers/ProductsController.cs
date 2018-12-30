@@ -9,11 +9,17 @@ using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
 
+using Microsoft.AspNetCore.Authorization;
+
+
 namespace LeasingCore.Controllers
 {
     public class ProductsController : Controller
     {
         LeasingContext _context = new LeasingContext();
+
+
+        [Authorize]
 
         public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "ProductName")
         {
