@@ -102,15 +102,24 @@ namespace LeasingCore.Controllers
                     };
                     _context.Add(ld);
                 }
-                _context.SaveChanges();
-
+                try
+                {
+                    _context.SaveChanges();
+                }
+                catch
+                {
+                    ViewBag.ErrorMessage = "Your cart can't be empty";
+                    return View("Index");
+                }
+                
+                
                 cart = null;
                 SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
 
                 return RedirectToAction("Index", "HomeController");
             }
             else
-                ViewBag.ErrorMessage = "Koszyk nie może być pusty";
+                ViewBag.ErrorMessage = "Your cart can't be empty";
                 return View("Index");
             
             
