@@ -28,11 +28,15 @@ namespace LeasingCore.Controllers
         {
             var cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
             ViewBag.cart = cart;
+
             if (cart != null)
             {
                 ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
                 return View();
             }
+
+
+
             return View();
 
             //var leasingContext = _context.Products.Include(p => p.Category);
@@ -80,6 +84,7 @@ namespace LeasingCore.Controllers
         {
             List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
 
+
             
                 Leasing l = new Leasing
                 {
@@ -120,6 +125,7 @@ namespace LeasingCore.Controllers
 
             
             
+
         }
 
         private int isExist(int id)

@@ -8,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ReflectionIT.Mvc.Paging;
+
 using System;
+
 
 namespace LeasingCore
 {
@@ -37,6 +39,7 @@ namespace LeasingCore
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
@@ -68,6 +71,7 @@ namespace LeasingCore
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSession();
