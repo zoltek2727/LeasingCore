@@ -1,4 +1,4 @@
-﻿@model LeasingCore.Models.ProductParam
+﻿@model LeasingCore.Models.Product
 
 @{
     ViewData["Title"] = "Details";
@@ -11,49 +11,82 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.ProductId)
+            @Html.DisplayNameFor(model => model.ProductName)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.ProductId)
+            @Html.DisplayFor(model => model.ProductName)
+        </dd>
+        @foreach (var photoItem in Model.PhotoProducts)
+        {
+            @if (photoItem.PhotoProductIsDefault)
+            {
+                <dt>
+                    @Html.DisplayNameFor(modelPhoto => photoItem.Photo.PhotoUrl)
+                </dt>
+                <dd>
+                    <img src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
+                </dd>
+            }
+            else
+            {
+                <dt>
+                    @Html.DisplayNameFor(modelPhoto => photoItem.Photo.PhotoUrl)
+                </dt>
+                <dd>
+                    <img src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
+                </dd>
+            }
+        }
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductDescription)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ProductDescription)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Product.ProductName)
+            @Html.DisplayNameFor(model => model.ProductPrice)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Product.ProductName)
+            @Html.DisplayFor(model => model.ProductPrice)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Product.ProductPrice)
+            @Html.DisplayNameFor(model => model.ProductAvailability)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Product.ProductPrice)
+            @Html.DisplayFor(model => model.ProductAvailability)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Product.ProductAvailability)
+            @Html.DisplayNameFor(model => model.ProductCode)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Product.ProductAvailability)
+            @Html.DisplayFor(model => model.ProductCode)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Product.ProductCode)
+            @Html.DisplayNameFor(model => model.Category.CategoryName)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Product.ProductCode)
+            @Html.DisplayFor(model => model.Category.CategoryName)
         </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Product.Category.CategoryName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Product.Category.CategoryName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Param.ParamName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Param.ParamName)
-        </dd>
+        @foreach (var item in Model.ProductParams)
+        {
+            <dt>
+                @Html.DisplayNameFor(modelItem => item.Param.ParamName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(modelItem => item.Param.ParamName)
+            </dd>
+            @foreach (var paramItem in item.Param.ParamAssortments)
+            {
+                <dt>
+                    @Html.DisplayNameFor(modelItem => paramItem.ParamAssortmentName)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(modelItem => paramItem.ParamAssortmentName)
+                </dd>
+            }
+        }
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a> |
+    <a asp-controller="Cart" asp-action="Buy" asp-route-id="@Model.ProductId">Add to Cart</a> |
     <a asp-action="Index">Back to List</a>
 </div>

@@ -6,90 +6,143 @@
     ViewData["Title"] = "Index";
 }
 
+<div class="container">
+    <div class="row">
+        <div class="col-xs-2">
+            <div class="col-xs-12" id="sticky-sidebar">
+                <h2>Filtrs</h2>
+                @foreach (var item in ViewBag.ListOfCategories)
+                {
+                    <form method="get">
+                        <button type="submit" name="categoryFilter" asp-for="@Model.RouteValue["categoryFilter"]" value="@item.CategoryId">
+                            @item.CategoryName
+                        </button>
+                        <br />
+                    </form>
+                }
+                </div>
+        </div>
+        <div class="col-xs-10" id="main">
 
-<h2>Products</h2>
+            <h2>Products</h2>
 
+            <p>
+                <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Create")'">Create New</button>
+            </p>
 
-<nav aria-label="Suppliers navigation example">
-    @await this.Component.InvokeAsync("Pager", new { pagingList = this.Model })
-</nav>
+            <form method="get" class="form-inline">
+                <input name="filter" id="filterProduct" class="form-control" placeholder="Search for product"
+                       value="@Model.RouteValue["Filter"]" />
+                <select name="categoryFilter" asp-for="@Model.RouteValue["categoryFilter"]" class="form-control"
+                        asp-items="@(new SelectList(@ViewBag.ListOfCategories, "CategoryId", "CategoryName"))">
+                    <option value="" selected>--- SELECT ---</option>
+                </select>
+                <button type="submit" class="btn btn-info">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search
+                </button>
+                <select name="sortExpression" asp-for="@Model.RouteValue["sortExpression"]" class="form-control" onchange="this.form.submit();">
+                    <option value="ProductName" selected>Product Name Asc</option>
+                    <option value="-ProductName">Product Name Desc</option>
+                    <option value="ProductPrice">Product Price Asc</option>
+                    <option value="-ProductPrice">Product Price Desc</option>
+                    <option value="Category.CategoryName">Category Name Asc</option>
+                    <option value="-Category.CategoryName">Category Name Desc</option>
+                </select>
+            </form>
 
-<p>
-    <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Create")'">Create New</button>
-</p>
+            <nav aria-label="Suppliers navigation example">
+                @await this.Component.InvokeAsync("Pager", new { pagingList = this.Model })
+            </nav>
 
-<form method="get" class="form-inline">
-    <input name="filter" class="form-control" placeholder="filter"
-           value="@Model.RouteValue["Filter"]" />
-    <button type="submit" class="btn btn-info">
-        <span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search
-    </button>
-</form>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.SortableHeaderFor(model => model.ProductId)
+                        </th>
+                        <th>
+                            @Html.SortableHeaderFor(model => model.ProductName)
+                        </th>
+                        <th>
+                            @Html.SortableHeaderFor(model => model.ProductPrice)
+                        </th>
+                        <th>
+                            @Html.SortableHeaderFor(model => model.ProductAvailability)
+                        </th>
+                        <th>
+                            @Html.SortableHeaderFor(model => model.ProductCode)
+                        </th>
+                        <th>
+                            @Html.SortableHeaderFor(model => model.Category.CategoryName)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProductId)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProductName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProductPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProductAvailability)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProductCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                            </td>
+                            <td>
+                                <a asp-controller="Cart" asp-action="Buy" asp-route-id="@item.ProductId">Add to Cart</a> |
+                                @*<a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |*@
+                                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
+                                @*<a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>*@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
-@*<form asp-controller="Products" asp-action="Index">
-        <p>
-            Product Name: <input type="text" name="SearchString">
-            <input type="submit" class="btn-primary" value="Filter" />
-        </p>
-    </form>*@
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.SortableHeaderFor(model => model.ProductId)
-            </th>
-            <th>
-                @Html.SortableHeaderFor(model => model.ProductName)
-            </th>
-            <th>
-                @Html.SortableHeaderFor(model => model.ProductPrice)
-            </th>
-            <th>
-                @Html.SortableHeaderFor(model => model.ProductAvailability)
-            </th>
-            <th>
-                @Html.SortableHeaderFor(model => model.ProductCode)
-            </th>
-            <th>
-                @Html.SortableHeaderFor(model => model.Category.CategoryName)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+            @*@foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductAvailability)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
-            </td>
-            <td>
-                <a asp-controller="Cart" asp-action="Buy" asp-route-id="@item.ProductId">Buy Now</a>
-                <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
-            </td>
-        </tr>
-        }
-    </tbody>
-</table>
+            <div class="card text-danger bg-info" style="width:auto">
+                <img class="card-img-top" src="~/images/paris.jpg" alt="Card image">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        @Html.DisplayFor(modelItem => item.ProductName)
+                    </h4>
+                    <p class="card-text">
+                        @Html.DisplayFor(modelItem => item.ProductPrice)
+                    </p>
+                    <a href="#" class="btn btn-primary">See Profile</a>
+                </div>
+            </div>
+        }*@
 
-<nav aria-label="Suppliers navigation example">
-    <vc:pager paging-list="@Model" />
-</nav>
+            <nav aria-label="Suppliers navigation example">
+                <vc:pager paging-list="@Model" />
+            </nav>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#filterProduct').autocomplete({
+                source: '/Products/Search'
+            });
+        });
+    </script>
+}

@@ -1,0 +1,37 @@
+﻿@model LeasingCore.Models.ParamAssortment
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>ParamAssortment</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ParamAssortmentName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ParamAssortmentName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ParamAssortmentBrand)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ParamAssortmentBrand)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Param)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Param.ParamName)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ParamAssortmentId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

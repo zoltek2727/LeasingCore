@@ -18,10 +18,7 @@ namespace LeasingCore.Controllers
     {
         LeasingContext _context = new LeasingContext();
 
-
-        [Authorize]
-
-        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "ProductName")
+        public async Task<IActionResult> Index(string filter, string categoryFilter, int page = 1, string sortExpression = "ProductName")
         {
             //var products = from p in dbContext.Products
             //               select p;
@@ -39,18 +36,52 @@ namespace LeasingCore.Controllers
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                qry = qry.Where(p => p.ProductName.Contains(filter));
+                if (string.IsNullOrWhiteSpace(categoryFilter))
+                {
+                    qry = qry.Where(p => p.ProductName.Contains(filter));
+                }
+                else
+                {
+                    qry = qry.Where(p => p.ProductName.Contains(filter)).Where(p => p.Category.CategoryId == Convert.ToInt32(categoryFilter));
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(categoryFilter))
+                {
+                    qry = qry.Where(p => p.Category.CategoryId == Convert.ToInt32(categoryFilter));
+                }     
             }
 
             var model = await PagingList.CreateAsync(qry, 3, page, sortExpression, "ProductName");
 
             model.RouteValue = new RouteValueDictionary {
-                { "filter", filter}
+                { "filter", filter},
+                { "categoryFilter", categoryFilter },
+                { "sortExpression", sortExpression }
             };
+
+            ViewBag.ListOfCategories = _context.Categories.OrderBy(c=>c.CategoryName).ToList();
 
             return View(model);
 
             //return View(await dbContext.Products.Include(p => p.Category).ToListAsync());
+        }
+
+        [Produces("application/json")]
+        [HttpGet]
+        public async Task<IActionResult> Search()
+        {
+            try
+            {
+                string term = HttpContext.Request.Query["term"].ToString();
+                var names = _context.Products.Where(p => p.ProductName.Contains(term)).Select(p => p.ProductName).ToList();
+                return Ok(names);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -60,7 +91,13 @@ namespace LeasingCore.Controllers
                 return NotFound();
             }
 
-            var products = await _context.ProductParams.Include(p => p.Param).Include(p => p.Product).Include(c=>c.Product.Category)
+            var products = await _context.Products
+                .Include(c=>c.Category)
+                .Include(p => p.ProductParams)
+                    .ThenInclude(p => p.Param)
+                        .ThenInclude(p => p.ParamAssortments)
+                .Include(p => p.PhotoProducts)
+                    .ThenInclude(p => p.Photo)
                 .SingleOrDefaultAsync(p => p.ProductId == id);
             if (products == null)
             {
@@ -72,6 +109,7 @@ namespace LeasingCore.Controllers
 
         public IActionResult Create()
         {
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
             return View();
         }
 
@@ -85,6 +123,7 @@ namespace LeasingCore.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", products.CategoryId);
             return View(products);
         }
 

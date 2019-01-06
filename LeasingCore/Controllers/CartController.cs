@@ -45,7 +45,7 @@ namespace LeasingCore.Controllers
             //return View(await leasingContext.ToListAsync());
         }
 
-        [Route("buy/{id}")]
+        [Route("Buy/{id}")]
         public IActionResult Buy(int id)
         {
             Product productModel = new Product();
