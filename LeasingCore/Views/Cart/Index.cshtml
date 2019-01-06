@@ -23,9 +23,6 @@
                 Price
             </th>
             <th>
-                Available
-            </th>
-            <th>
                 Code
             </th>
             <th>
@@ -50,24 +47,20 @@
                     <td>
                         @item.Product.ProductName
                     </td>
-                    <td>
+                    <td id="Price">
                         @item.Product.ProductPrice
-                    </td>
-                    <td>
-                        @item.Product.ProductAvailability
                     </td>
                     <td>
                         @item.Product.ProductCode
                     </td>
                     <td>
-                        @item.Quantity
+                        <input onchange="updateLabel()" id="Quantity" type="number" min="1" step="1" max="@item.Product.ProductAvailability" value="@item.Quantity" class="form-control" /> from @item.Product.ProductAvailability
                     </td>
-                    <td>
+                    <td id="SubTotal">
                         @(item.Product.ProductPrice * item.Quantity)
                     </td>
                 </tr>
             }
-
             <tr>
                 <td align="right" colspan="7">Sum</td>
                 <td>
@@ -75,7 +68,7 @@
                 </td>
             </tr>
         }
-        
+
     </tbody>
 </table>
 <p class="text-danger">@ViewBag.ErrorMessage</p>
@@ -83,3 +76,14 @@
 <br>
 <a asp-controller="Products" asp-action="Index">Continue Shopping</a>
 <a asp-controller="Cart" asp-action="Leasing">Leasing</a>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script type="text/javascript">
+        function updateLabel() {
+            var Total = document.getElementById('Price').value * document.getElementById('Quantity').value;
+            document.getElementById('SubTotal').innerHTML = Total.toString();
+        }
+    </script>
+}

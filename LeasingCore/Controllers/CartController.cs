@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using Microsoft.AspNetCore.Authorization;
 using LeasingCore.Helpers;
+using System.Net.Mail;
+using System.Net;
 
 namespace LeasingCore.Controllers
 {
@@ -43,7 +45,7 @@ namespace LeasingCore.Controllers
             //return View(await leasingContext.ToListAsync());
         }
 
-        [Route("buy/{id}")]
+        [Route("Buy/{id}")]
         public IActionResult Buy(int id)
         {
             Product productModel = new Product();
@@ -121,11 +123,21 @@ namespace LeasingCore.Controllers
                 cart = null;
                 SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
 
-                return RedirectToAction("Index", "HomeController");
+            SmtpClient client = new SmtpClient();
+            client.Host = "smtp.gmail.com";
+            client.Port = 587;
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential("mail@gmail.com", "haslo");
 
-            
-            
+            MailMessage mailMessage = new MailMessage();
+            mailMessage.From = new MailAddress("mail@gmail.com");
+            mailMessage.To.Add("mail@wp.pl");
+            mailMessage.Body = "body";
+            mailMessage.Subject = "subject";
+            client.Send(mailMessage);
 
+            return RedirectToAction("Index", "Leasings");
         }
 
         private int isExist(int id)

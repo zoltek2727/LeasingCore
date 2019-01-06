@@ -17,6 +17,8 @@ namespace LeasingCore.Models
         public DbSet<ProductParam> ProductParams { get; set; }
         public DbSet<Param> Params { get; set; }
         public DbSet<ParamAssortment> ParamAssortments { get; set; }
+        public DbSet<Photo> Photos { get; set; }
+        public DbSet<PhotoProduct> PhotoProducts { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
