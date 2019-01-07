@@ -20,18 +20,10 @@ namespace LeasingCore.Controllers
 
         public async Task<IActionResult> Index(string filter, string categoryFilter, int page = 1, string sortExpression = "ProductName")
         {
-            //var products = from p in dbContext.Products
-            //               select p;
-
-            //if (!String.IsNullOrEmpty(SearchString))
-            //{
-            //    products = products.Where(p=>p.ProductName.Contains(SearchString));
-            //}
-
-            //return View(await products.Include(p=>p.Category).ToListAsync());
-
             var qry = _context.Products.AsNoTracking()
                 .Include(p => p.Category)
+                .Include(p => p.PhotoProducts)
+                    .ThenInclude(p => p.Photo)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter))
@@ -53,7 +45,7 @@ namespace LeasingCore.Controllers
                 }     
             }
 
-            var model = await PagingList.CreateAsync(qry, 3, page, sortExpression, "ProductName");
+            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "ProductName");
 
             model.RouteValue = new RouteValueDictionary {
                 { "filter", filter},
@@ -64,8 +56,6 @@ namespace LeasingCore.Controllers
             ViewBag.ListOfCategories = _context.Categories.OrderBy(c=>c.CategoryName).ToList();
 
             return View(model);
-
-            //return View(await dbContext.Products.Include(p => p.Category).ToListAsync());
         }
 
         [Produces("application/json")]

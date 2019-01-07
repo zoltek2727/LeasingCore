@@ -3,9 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <h2>Your cart</h2>
-
 
 <table class="table">
     <thead>
@@ -40,7 +38,11 @@
             @foreach (var item in ViewBag.cart)
             {
                 <tr>
-                    <td><a asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">Remove</a></td>
+                    <td>
+                        <a class="btn btn-danger" asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                        </a>
+                    </td>
                     <td>
                         @item.Product.ProductId
                     </td>
@@ -74,8 +76,12 @@
 <p class="text-danger">@ViewBag.ErrorMessage</p>
 
 <br>
-<a asp-controller="Products" asp-action="Index">Continue Shopping</a>
-<a asp-controller="Cart" asp-action="Leasing">Leasing</a>
+<a class="btn btn-default" asp-controller="Products" asp-action="Index">
+    <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> Continue Shopping
+</a>
+<a class="btn btn-primary" asp-controller="Cart" asp-action="Leasing">
+    <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Leasing
+</a>
 
 @section Scripts {
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">

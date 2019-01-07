@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using LeasingCore.Helpers;
 using LeasingCore.Models;
 using Microsoft.AspNetCore.Authorization;
-using LeasingCore.Helpers;
-using System.Net.Mail;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Mail;
 
 namespace LeasingCore.Controllers
 {
     public class CartController : Controller
     {
-        //private readonly LeasingContext _context;
-
-        //public CartController(LeasingContext context)
-        //{
-        //    _context = context;
-        //}
-
         LeasingContext _context = new LeasingContext();
 
         // GET: Cart
@@ -37,12 +29,7 @@ namespace LeasingCore.Controllers
                 return View();
             }
 
-
-
             return View();
-
-            //var leasingContext = _context.Products.Include(p => p.Category);
-            //return View(await leasingContext.ToListAsync());
         }
 
         [Route("Buy/{id}")]
@@ -86,42 +73,39 @@ namespace LeasingCore.Controllers
         {
             List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
 
+            Leasing l = new Leasing
+            {
+                LeasingStart = DateTime.Now,
+                LeasingEnd = DateTime.MaxValue,
+                LeasingExtend = true,
+                UserId = 1
+            };
+            _context.Add(l);
 
-            
-                Leasing l = new Leasing
+            LeasingDetail ld;
+
+            foreach (var item in cart)
+            {
+                ld = new LeasingDetail
                 {
-                    LeasingStart = DateTime.Now,
-                    LeasingEnd = DateTime.MaxValue,
-                    LeasingExtend = true,
-                    UserId = 1
+                    LeasingId = l.LeasingId,
+                    LeasingDetailAmount = item.Quantity,
+                    ProductId = item.Product.ProductId
                 };
-                _context.Add(l);
-
-                LeasingDetail ld;
-
-                foreach (var item in cart)
-                {
-                    ld = new LeasingDetail
-                    {
-                        LeasingId = l.LeasingId,
-                        LeasingDetailAmount = item.Quantity,
-                        ProductId = item.Product.ProductId
-                    };
-                    _context.Add(ld);
-                }
-                try
-                {
-                    _context.SaveChanges();
-                }
-                catch
-                {
-                    ViewBag.ErrorMessage = "Your cart can't be empty";
-                    return View("Index");
-                }
+                _context.Add(ld);
+            }
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch
+            {
+                ViewBag.ErrorMessage = "Your cart can't be empty";
+                return View("Index");
+            }
                 
-                
-                cart = null;
-                SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
+            cart = null;
+            SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
 
             SmtpClient client = new SmtpClient();
             client.Host = "smtp.gmail.com";

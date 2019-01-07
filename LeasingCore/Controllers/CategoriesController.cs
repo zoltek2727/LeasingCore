@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
+using ReflectionIT.Mvc.Paging;
+using Microsoft.AspNetCore.Routing;
 
 namespace LeasingCore.Controllers
 {
@@ -14,27 +16,38 @@ namespace LeasingCore.Controllers
         LeasingContext _context = new LeasingContext();
 
         // GET: Categories
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "CategoryName")
         {
-            return View(await _context.Categories.ToListAsync());
+            var qry = _context.Categories.OrderBy(c=>c.CategoryName).AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                qry = qry.Where(c => c.CategoryName.Contains(filter));
+            }
+
+            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "CategoryName");
+
+            model.RouteValue = new RouteValueDictionary {
+                { "filter", filter}
+            };
+
+            return View(model);
         }
 
-        // GET: Categories/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [Produces("application/json")]
+        [HttpGet]
+        public async Task<IActionResult> Search()
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                string term = HttpContext.Request.Query["term"].ToString();
+                var names = _context.Categories.Where(c => c.CategoryName.Contains(term)).OrderBy(c=>c.CategoryName).Select(c => c.CategoryName).ToList();
+                return Ok(names);
             }
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
-            if (category == null)
+            catch
             {
-                return NotFound();
+                return BadRequest();
             }
-
-            return View(category);
         }
 
         // GET: Categories/Create
@@ -110,28 +123,37 @@ namespace LeasingCore.Controllers
             return View(category);
         }
 
+        //// GET: Categories/Delete/5
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var category = await _context.Categories
+        //        .FirstOrDefaultAsync(m => m.CategoryId == id);
+        //    if (category == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(category);
+        //}
+
+        //// POST: Categories/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    var category = await _context.Categories.FindAsync(id);
+        //    _context.Categories.Remove(category);
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
+
         // GET: Categories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return View(category);
-        }
-
-        // POST: Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var category = await _context.Categories.FindAsync(id);
             _context.Categories.Remove(category);

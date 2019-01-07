@@ -1,0 +1,19 @@
+﻿<form method="get" class="form-inline">
+    <input name="filter" id="filterProduct" class="form-control" placeholder="Search for product"
+           value="@Model.RouteValue["Filter"]" />
+    <button type="submit" class="btn btn-info">
+        <span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search
+    </button>
+</form>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#filterProduct').autocomplete({
+                source: '/Products/Search'
+            });
+        });
+    </script>
+}
