@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-xs-2">
             <div class="col-xs-12" id="sticky-sidebar">
-                <h2>Filtrs</h2>
+                <h2>Filters</h2>
                 @foreach (var item in ViewBag.ListOfCategories)
                 {
                     <form method="get">
@@ -20,14 +20,16 @@
                         <br />
                     </form>
                 }
-                </div>
+            </div>
         </div>
         <div class="col-xs-10" id="main">
 
             <h2>Products</h2>
 
             <p>
-                <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Create")'">Create New</button>
+                <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Create")'">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create New
+                </button>
             </p>
 
             <form method="get" class="form-inline">
@@ -50,11 +52,13 @@
                 </select>
             </form>
 
+            <br />
+
             <nav aria-label="Suppliers navigation example">
                 @await this.Component.InvokeAsync("Pager", new { pagingList = this.Model })
             </nav>
 
-            <table class="table">
+            @*<table class="table">
                 <thead>
                     <tr>
                         <th>
@@ -101,31 +105,99 @@
                                 @Html.DisplayFor(modelItem => item.Category.CategoryName)
                             </td>
                             <td>
-                                <a asp-controller="Cart" asp-action="Buy" asp-route-id="@item.ProductId">Add to Cart</a> |
-                                @*<a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |*@
-                                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
-                                @*<a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>*@
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                                <a class="btn btn-warning" asp-controller="Cart" asp-action="Buy" asp-route-id="@item.ProductId">
+                                    <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add to Cart
+                                </a>
+                                @*<a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a>*@
+            @*<a class="btn btn-info" asp-action="Details" asp-route-id="@item.ProductId">
+                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details
+                </a>*@
+            @*<a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>*@
+            @*</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>*@
 
-            @*@foreach (var item in Model)
-        {
-            <div class="card text-danger bg-info" style="width:auto">
-                <img class="card-img-top" src="~/images/paris.jpg" alt="Card image">
-                <div class="card-body">
-                    <h4 class="card-title">
-                        @Html.DisplayFor(modelItem => item.ProductName)
-                    </h4>
-                    <p class="card-text">
-                        @Html.DisplayFor(modelItem => item.ProductPrice)
-                    </p>
-                    <a href="#" class="btn btn-primary">See Profile</a>
+            @foreach (var item in Model)
+            {
+                <div class="thumbnail">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            @if (item.PhotoProducts.Count > 1)
+                            {
+                                @foreach (var photoItem in item.PhotoProducts)
+                                {
+                                    @if (photoItem.PhotoProductIsDefault)
+                                    {
+                                        <img src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="" class="img-responsive" />
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <img src="http://tech.firstpost.com/wp-content/uploads/2014/09/Apple_iPhone6_Reuters.jpg" alt="" class="img-responsive">
+                            }
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="caption">
+                                <h3>
+                                    <a class="label label-info" asp-action="Details" asp-route-id="@item.ProductId">
+                                        @Html.DisplayFor(modelItem => item.ProductName)
+                                    </a>
+                                </h3>
+                                <h4>
+                                    @Html.DisplayFor(modelItem => item.ProductDescription)
+                                </h4>
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <h6>
+                                            <b>@Html.DisplayNameFor(modelItem => item.ProductAvailability)</b>
+                                        </h6>
+                                    </div>
+                                    <div class="col-xs-1">
+                                        <h6>
+                                            @Html.DisplayFor(modelItem => item.ProductAvailability)
+                                        </h6>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <h6>
+                                            <b>@Html.DisplayNameFor(modelItem => item.ProductCode)</b>
+                                        </h6>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <h6>
+                                            @Html.DisplayFor(modelItem => item.ProductCode)
+                                        </h6>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <h6>
+                                            <b>@Html.DisplayNameFor(modelItem => item.Category.CategoryName)</b>
+                                        </h6>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <h6>
+                                            @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+                            <div class="space-ten"></div>
+                            <h4 class="pull-right">
+                                @Html.DisplayFor(modelItem => item.ProductPrice) PLN
+                            </h4>
+                            <div class="btn-ground text-right">
+                                <a class="btn btn-warning" asp-controller="Cart" asp-action="Buy" asp-route-id="@item.ProductId">
+                                    <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add to Cart
+                                </a>
+                            </div>
+                            <div class="space-ten"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        }*@
+            }
 
             <nav aria-label="Suppliers navigation example">
                 <vc:pager paging-list="@Model" />

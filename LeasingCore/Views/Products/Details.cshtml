@@ -6,87 +6,85 @@
 
 <h2>Details</h2>
 
-<div>
-    <h4>Products</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.ProductName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ProductName)
-        </dd>
+<div class="row">
+    <div class="col-xs-4 item-photo">
         @foreach (var photoItem in Model.PhotoProducts)
         {
             @if (photoItem.PhotoProductIsDefault)
             {
-                <dt>
-                    @Html.DisplayNameFor(modelPhoto => photoItem.Photo.PhotoUrl)
-                </dt>
-                <dd>
-                    <img src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
-                </dd>
+                <img style="max-width:100%;" src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
             }
             else
             {
-                <dt>
-                    @Html.DisplayNameFor(modelPhoto => photoItem.Photo.PhotoUrl)
-                </dt>
-                <dd>
-                    <img src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
-                </dd>
+                <img style="max-width:33%;" src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
             }
         }
-        <dt>
-            @Html.DisplayNameFor(model => model.ProductDescription)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ProductDescription)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ProductPrice)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ProductPrice)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ProductAvailability)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ProductAvailability)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ProductCode)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ProductCode)
-        </dd>
-        <dt>
+    </div>
+    <div class="col-xs-5" style="border:0px solid gray">
+        <h3>@Html.DisplayFor(model => model.ProductName)</h3>
+        <h5 style="color:#337ab7">
             @Html.DisplayNameFor(model => model.Category.CategoryName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Category.CategoryName)
-        </dd>
-        @foreach (var item in Model.ProductParams)
-        {
-            <dt>
-                @Html.DisplayNameFor(modelItem => item.Param.ParamName)
-            </dt>
-            <dd>
-                @Html.DisplayFor(modelItem => item.Param.ParamName)
-            </dd>
-            @foreach (var paramItem in item.Param.ParamAssortments)
+            <a href="#">
+                @Html.DisplayFor(model => model.Category.CategoryName)
+            </a>
+        </h5>
+
+        <h6 class="title-price">
+            <small>
+                @Html.DisplayNameFor(model => model.ProductPrice)
+            </small>
+        </h6>
+        <h3 style="margin-top:0px;">
+            @Html.DisplayFor(model => model.ProductPrice)
+        </h3>
+
+        <div class="section" style="padding-bottom:5px;">
+            <h6 class="title-attr">
+                <small>
+                    @Html.DisplayNameFor(model => model.ProductCode)
+                </small>
+            </h6>
+        <div>
+            <div class="attr2">
+                @Html.DisplayFor(model => model.ProductCode)
+            </div>
+        </div>
+        </div>
+        <div class="section" style="padding-bottom:5px;">
+            @foreach (var item in Model.ProductParams)
             {
-                <dt>
-                    @Html.DisplayNameFor(modelItem => paramItem.ParamAssortmentName)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(modelItem => paramItem.ParamAssortmentName)
-                </dd>
+                <h6 class="title-attr"><small>@Html.DisplayFor(modelItem => item.Param.ParamName)</small></h6>
+                <div>
+                    @foreach (var paramItem in item.Param.ParamAssortments)
+                    {
+                        <div class="attr2">@Html.DisplayFor(modelItem => paramItem.ParamAssortmentName)</div>
+                    }
+                </div>
             }
-        }
-</div>
-<div>
-    <a asp-controller="Cart" asp-action="Buy" asp-route-id="@Model.ProductId">Add to Cart</a> |
-    <a asp-action="Index">Back to List</a>
+        </div>
+        <div class="section" style="padding-bottom:20px;">
+            <h6 class="title-attr"><small>@Html.DisplayNameFor(model => model.ProductAvailability)</small></h6>
+            <div>
+                <div class="btn-minus"><span class="glyphicon glyphicon-minus"></span></div>
+                <input value="1" />
+                <div class="btn-plus"><span class="glyphicon glyphicon-plus"></span></div> from @Html.DisplayFor(model => model.ProductAvailability)
+            </div>
+        </div>
+
+        <div class="section" style="padding-bottom:20px;">
+            <a class="btn btn-warning" asp-controller="Cart" asp-action="Buy" asp-route-id="@Model.ProductId">
+                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add to Cart
+            </a>
+            <a class="btn btn-default" asp-action="Index">
+                <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> Back to List
+            </a>
+        </div>
+    </div>
+    <div style="width:100%;border-top:1px solid silver">
+        <p style="padding:15px;">
+            <small>
+                @Html.DisplayFor(model => model.ProductDescription)
+            </small>
+        </p>
+    </div>
 </div>
