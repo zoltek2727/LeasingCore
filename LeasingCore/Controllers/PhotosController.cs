@@ -1,28 +1,31 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
-using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
+using ReflectionIT.Mvc.Paging;
 
 namespace LeasingCore.Controllers
 {
-    public class CategoriesController : Controller
+    public class PhotosController : Controller
     {
         LeasingContext _context = new LeasingContext();
 
-        // GET: Categories
-        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "CategoryName")
+        // GET: Photos
+        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "PhotoUrl")
         {
-            var qry = _context.Categories.OrderBy(c=>c.CategoryName).AsNoTracking().AsQueryable();
+            var qry = _context.Photos.OrderBy(p => p.PhotoUrl).AsNoTracking().AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                qry = qry.Where(c => c.CategoryName.Contains(filter));
+                qry = qry.Where(c => c.PhotoUrl.Contains(filter));
             }
 
-            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "CategoryName");
+            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "PhotoUrl");
 
             model.RouteValue = new RouteValueDictionary {
                 { "filter", filter}
@@ -38,7 +41,7 @@ namespace LeasingCore.Controllers
             try
             {
                 string term = HttpContext.Request.Query["term"].ToString();
-                var names = _context.Categories.Where(c => c.CategoryName.Contains(term)).OrderBy(c=>c.CategoryName).Select(c => c.CategoryName).ToList();
+                var names = _context.Photos.Where(p=>p.PhotoUrl.Contains(term)).OrderBy(p => p.PhotoUrl).Select(p => p.PhotoUrl).ToList();
                 return Ok(names);
             }
             catch
@@ -47,29 +50,29 @@ namespace LeasingCore.Controllers
             }
         }
 
-        // GET: Categories/Create
+        // GET: Photos/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: Photos/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName")] Category category)
+        public async Task<IActionResult> Create([Bind("PhotoId,PhotoUrl")] Photo photo)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(photo);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(photo);
         }
 
-        // GET: Categories/Edit/5
+        // GET: Photos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,22 +80,22 @@ namespace LeasingCore.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var photo = await _context.Photos.FindAsync(id);
+            if (photo == null)
             {
                 return NotFound();
             }
-            return View(category);
+            return View(photo);
         }
 
-        // POST: Categories/Edit/5
+        // POST: Photos/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("PhotoId,PhotoUrl")] Photo photo)
         {
-            if (id != category.CategoryId)
+            if (id != photo.PhotoId)
             {
                 return NotFound();
             }
@@ -101,12 +104,12 @@ namespace LeasingCore.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(photo);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.CategoryId))
+                    if (!PhotoExists(photo.PhotoId))
                     {
                         return NotFound();
                     }
@@ -117,50 +120,21 @@ namespace LeasingCore.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(photo);
         }
 
-        //// GET: Categories/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var category = await _context.Categories
-        //        .FirstOrDefaultAsync(m => m.CategoryId == id);
-        //    if (category == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(category);
-        //}
-
-        //// POST: Categories/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var category = await _context.Categories.FindAsync(id);
-        //    _context.Categories.Remove(category);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        // GET: Categories/Delete/5
+        // GET: Photos/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(category);
+            var photo = await _context.Photos.FindAsync(id);
+            _context.Photos.Remove(photo);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool PhotoExists(int id)
         {
-            return _context.Categories.Any(e => e.CategoryId == id);
+            return _context.Photos.Any(e => e.PhotoId == id);
         }
     }
 }
