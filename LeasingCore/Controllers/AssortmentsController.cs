@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
@@ -8,21 +11,24 @@ using Microsoft.AspNetCore.Routing;
 
 namespace LeasingCore.Controllers
 {
-    public class CategoriesController : Controller
+    public class AssortmentsController : Controller
     {
         LeasingContext _context = new LeasingContext();
 
-        // GET: Categories
-        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "CategoryName")
+        // GET: Assortments
+        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "AssortmentName")
         {
-            var qry = _context.Categories.OrderBy(c=>c.CategoryName).AsNoTracking().AsQueryable();
+            //var leasingContext = _context.Assortments.Include(a => a.Param);
+            //return View(await leasingContext.ToListAsync());
+
+            var qry = _context.Assortments.Include(p=>p.Param).OrderBy(a => a.AssortmentName).AsNoTracking().AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                qry = qry.Where(c => c.CategoryName.Contains(filter));
+                qry = qry.Where(a => a.AssortmentName.Contains(filter));
             }
 
-            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "CategoryName");
+            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "AssortmentName");
 
             model.RouteValue = new RouteValueDictionary {
                 { "filter", filter}
@@ -38,7 +44,7 @@ namespace LeasingCore.Controllers
             try
             {
                 string term = HttpContext.Request.Query["term"].ToString();
-                var names = _context.Categories.Where(c => c.CategoryName.Contains(term)).OrderBy(c=>c.CategoryName).Select(c => c.CategoryName).ToList();
+                var names = _context.Assortments.Include(p=>p.Param).Where(a => a.AssortmentName.Contains(term)).OrderBy(a => a.AssortmentName).Select(a => a.AssortmentName).ToList();
                 return Ok(names);
             }
             catch
@@ -47,29 +53,31 @@ namespace LeasingCore.Controllers
             }
         }
 
-        // GET: Categories/Create
+        // GET: Assortments/Create
         public IActionResult Create()
         {
+            ViewData["ParamId"] = new SelectList(_context.Params, "ParamId", "ParamName");
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: Assortments/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName")] Category category)
+        public async Task<IActionResult> Create([Bind("AssortmentId,AssortmentName,AssortmentBrand,AssortmentPrice,ParamId")] Assortment assortment)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(assortment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["ParamId"] = new SelectList(_context.Params, "ParamId", "ParamName", assortment.ParamId);
+            return View(assortment);
         }
 
-        // GET: Categories/Edit/5
+        // GET: Assortments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,22 +85,23 @@ namespace LeasingCore.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var assortment = await _context.Assortments.FindAsync(id);
+            if (assortment == null)
             {
                 return NotFound();
             }
-            return View(category);
+            ViewData["ParamId"] = new SelectList(_context.Params, "ParamId", "ParamName", assortment.ParamId);
+            return View(assortment);
         }
 
-        // POST: Categories/Edit/5
+        // POST: Assortments/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("AssortmentId,AssortmentName,AssortmentBrand,AssortmentPrice,ParamId")] Assortment assortment)
         {
-            if (id != category.CategoryId)
+            if (id != assortment.AssortmentId)
             {
                 return NotFound();
             }
@@ -101,12 +110,12 @@ namespace LeasingCore.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(assortment);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.CategoryId))
+                    if (!AssortmentExists(assortment.AssortmentId))
                     {
                         return NotFound();
                     }
@@ -117,50 +126,22 @@ namespace LeasingCore.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["ParamId"] = new SelectList(_context.Params, "ParamId", "ParamName", assortment.ParamId);
+            return View(assortment);
         }
 
-        //// GET: Categories/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var category = await _context.Categories
-        //        .FirstOrDefaultAsync(m => m.CategoryId == id);
-        //    if (category == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(category);
-        //}
-
-        //// POST: Categories/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var category = await _context.Categories.FindAsync(id);
-        //    _context.Categories.Remove(category);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        // GET: Categories/Delete/5
+        // GET: Assortments/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(category);
+            var assortment = await _context.Assortments.FindAsync(id);
+            _context.Assortments.Remove(assortment);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool AssortmentExists(int id)
         {
-            return _context.Categories.Any(e => e.CategoryId == id);
+            return _context.Assortments.Any(e => e.AssortmentId == id);
         }
     }
 }

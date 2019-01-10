@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +8,6 @@ using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
 
-using Microsoft.AspNetCore.Authorization;
-
-
 namespace LeasingCore.Controllers
 {
     public class ProductsController : Controller
@@ -20,10 +16,13 @@ namespace LeasingCore.Controllers
 
         public async Task<IActionResult> Index(string filter, string categoryFilter, int page = 1, string sortExpression = "ProductName")
         {
-            var qry = _context.Products.AsNoTracking()
-                .Include(p => p.Category)
+            var qry = _context.Products.Where(p => p.ProductAvailability > 0).AsNoTracking()
+                .Include(c => c.Category)
                 .Include(p => p.PhotoProducts)
                     .ThenInclude(p => p.Photo)
+                .Include(p => p.ProductAssortments)
+                    .ThenInclude(a => a.Assortment)
+                        .ThenInclude(p=>p.Param)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter))
@@ -54,6 +53,7 @@ namespace LeasingCore.Controllers
             };
 
             ViewBag.ListOfCategories = _context.Categories.OrderBy(c=>c.CategoryName).ToList();
+            ViewBag.ListOfParams = _context.Params.Include(a=>a.Assortments).OrderBy(p => p.ParamName).ToList();
 
             return View(model);
         }
@@ -65,7 +65,7 @@ namespace LeasingCore.Controllers
             try
             {
                 string term = HttpContext.Request.Query["term"].ToString();
-                var names = _context.Products.Where(p => p.ProductName.Contains(term)).Select(p => p.ProductName).ToList();
+                var names = _context.Products.Where(p => p.ProductName.Contains(term)).Where(p=>p.ProductAvailability>0).Select(p => p.ProductName).ToList();
                 return Ok(names);
             }
             catch
@@ -83,12 +83,13 @@ namespace LeasingCore.Controllers
 
             var products = await _context.Products
                 .Include(c=>c.Category)
-                .Include(p => p.ProductParams)
-                    .ThenInclude(p => p.Param)
-                        .ThenInclude(p => p.ParamAssortments)
+                .Include(p => p.ProductAssortments)
+                    .ThenInclude(a => a.Assortment)
+                        .ThenInclude(p => p.Param)
                 .Include(p => p.PhotoProducts)
                     .ThenInclude(p => p.Photo)
                 .SingleOrDefaultAsync(p => p.ProductId == id);
+
             if (products == null)
             {
                 return NotFound();
@@ -105,7 +106,7 @@ namespace LeasingCore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,CategoryId")] Product products)
+        public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,ProductAdded,CategoryId")] Product products)
         {
             if (ModelState.IsValid)
             {
@@ -134,7 +135,7 @@ namespace LeasingCore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,CategoryId")] Product products)
+        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,ProductAdded,CategoryId")] Product products)
         {
             if (id != products.ProductId)
             {

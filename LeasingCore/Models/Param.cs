@@ -14,7 +14,6 @@ namespace LeasingCore.Models
         [MaxLength(30, ErrorMessage = "ParamName must be 30 characters or less"), MinLength(2)]
         public string ParamName { get; set; }
 
-        public ICollection<ProductParam> ProductParams { get; set; }
-        public ICollection<ParamAssortment> ParamAssortments { get; set; }
+        public ICollection<Assortment> Assortments { get; set; }
     }
 }

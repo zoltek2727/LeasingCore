@@ -1,0 +1,41 @@
+﻿@model LeasingCore.Models.Assortment
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create</h2>
+
+<h4>Assortment</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="AssortmentName" class="control-label"></label>
+                <input asp-for="AssortmentName" class="form-control" />
+                <span asp-validation-for="AssortmentName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AssortmentBrand" class="control-label"></label>
+                <input asp-for="AssortmentBrand" class="form-control" />
+                <span asp-validation-for="AssortmentBrand" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AssortmentPrice" class="control-label"></label>
+                <input asp-for="AssortmentPrice" class="form-control" />
+                <span asp-validation-for="AssortmentPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ParamId" class="control-label"></label>
+                <select asp-for="ParamId" class ="form-control" asp-items="ViewBag.ParamId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-default">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>

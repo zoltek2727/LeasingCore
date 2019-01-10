@@ -73,29 +73,28 @@ namespace LeasingCore.Controllers
         {
             List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
 
-            Leasing l = new Leasing
-            {
-                LeasingStart = DateTime.Now,
-                LeasingEnd = DateTime.MaxValue,
-                LeasingExtend = true,
-                UserId = 1
-            };
-            _context.Add(l);
-
-            LeasingDetail ld;
-
-            foreach (var item in cart)
-            {
-                ld = new LeasingDetail
-                {
-                    LeasingId = l.LeasingId,
-                    LeasingDetailAmount = item.Quantity,
-                    ProductId = item.Product.ProductId
-                };
-                _context.Add(ld);
-            }
             try
             {
+                Leasing l = new Leasing
+                {
+                    LeasingStart = DateTime.Now,
+                    UserId = 1
+                };
+                _context.Add(l);
+
+                LeasingDetail ld;
+
+                foreach (var item in cart)
+                {
+                    ld = new LeasingDetail
+                    {
+                        LeasingId = l.LeasingId,
+                        LeasingDetailAmount = item.Quantity,
+                        ProductId = item.Product.ProductId
+                    };
+                    _context.Add(ld);
+                }
+
                 _context.SaveChanges();
             }
             catch

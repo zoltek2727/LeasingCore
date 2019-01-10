@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
+using ReflectionIT.Mvc.Paging;
 
 namespace LeasingCore.Controllers
 {
@@ -14,10 +15,24 @@ namespace LeasingCore.Controllers
         LeasingContext _context = new LeasingContext();
 
         // GET: Leasings
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string sortExpression = "LeasingStart")
         {
-            var leasingContext = _context.Leasings.Include(l => l.User);
-            return View(await leasingContext.ToListAsync());
+            //var leasingContext = _context.Leasings
+            //    .Include(l => l.User)
+            //    .Include(l => l.LeasingDetails)
+            //        .ThenInclude(p => p.Product);
+            //return View(await leasingContext.ToListAsync());
+
+            var qry = _context.Leasings            
+                .Include(l => l.User)
+                .Include(l => l.LeasingDetails)
+                    .ThenInclude(p => p.Product)
+                .OrderByDescending(l => l.LeasingStart)
+                .AsNoTracking().AsQueryable();
+
+            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "CategoryName");
+
+            return View(model);
         }
 
         // GET: Leasings/Details/5
@@ -116,32 +131,31 @@ namespace LeasingCore.Controllers
             return View(leasing);
         }
 
-        // GET: Leasings/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var leasing = await _context.Leasings
-                .Include(l => l.User)
-                .FirstOrDefaultAsync(m => m.LeasingId == id);
-            if (leasing == null)
-            {
-                return NotFound();
-            }
-
-            return View(leasing);
+            var category = await _context.Categories.FindAsync(id);
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // POST: Leasings/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Extend(int id)
         {
-            var leasing = await _context.Leasings.FindAsync(id);
-            _context.Leasings.Remove(leasing);
+            var leasingDetail = await _context.LeasingDetails.FindAsync(id);
+            leasingDetail.LeasingDetailEnd = leasingDetail.LeasingDetailEnd.AddYears(1);
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Return(int id)
+        {
+            var leasingDetail = await _context.LeasingDetails.FindAsync(id);
+            leasingDetail.LeasingDetailEnd = DateTime.Now;
+
+            var product = await _context.Products.FindAsync(leasingDetail.ProductId);
+            product.ProductAvailability += leasingDetail.LeasingDetailAmount;
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

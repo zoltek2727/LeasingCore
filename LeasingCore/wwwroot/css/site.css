@@ -35,3 +35,11 @@ body {
         display: none;
     }
 }
+
+.btn em.glyphicon {
+    opacity: 0;
+}
+
+.btn.active em.glyphicon {
+    opacity: 1;
+}

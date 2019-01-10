@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
+using ReflectionIT.Mvc.Paging;
+using Microsoft.AspNetCore.Routing;
 
 namespace LeasingCore.Controllers
 {
@@ -14,27 +13,38 @@ namespace LeasingCore.Controllers
         LeasingContext _context = new LeasingContext();
 
         // GET: Params
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "ParamName")
         {
-            return View(await _context.Params.ToListAsync());
+            var qry = _context.Params.OrderBy(p => p.ParamName).AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                qry = qry.Where(p => p.ParamName.Contains(filter));
+            }
+
+            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "CategoryName");
+
+            model.RouteValue = new RouteValueDictionary {
+                { "filter", filter}
+            };
+
+            return View(model);
         }
 
-        // GET: Params/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [Produces("application/json")]
+        [HttpGet]
+        public async Task<IActionResult> Search()
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                string term = HttpContext.Request.Query["term"].ToString();
+                var names = _context.Params.Where(p => p.ParamName.Contains(term)).OrderBy(p => p.ParamName).Select(p => p.ParamName).ToList();
+                return Ok(names);
             }
-
-            var @param = await _context.Params
-                .FirstOrDefaultAsync(m => m.ParamId == id);
-            if (@param == null)
+            catch
             {
-                return NotFound();
+                return BadRequest();
             }
-
-            return View(@param);
         }
 
         // GET: Params/Create
@@ -111,27 +121,7 @@ namespace LeasingCore.Controllers
         }
 
         // GET: Params/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var @param = await _context.Params
-                .FirstOrDefaultAsync(m => m.ParamId == id);
-            if (@param == null)
-            {
-                return NotFound();
-            }
-
-            return View(@param);
-        }
-
-        // POST: Params/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var @param = await _context.Params.FindAsync(id);
             _context.Params.Remove(@param);
