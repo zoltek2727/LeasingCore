@@ -38,7 +38,7 @@ namespace LeasingCore.Controllers
             try
             {
                 string term = HttpContext.Request.Query["term"].ToString();
-                var names = _context.Categories.Where(c => c.CategoryName.Contains(term)).OrderBy(c=>c.CategoryName).Select(c => c.CategoryName).ToList();
+                var names = _context.Categories.Where(c => c.CategoryName.Contains(term)).OrderBy(c=>c.CategoryName).Select(c => new { c.CategoryId, c.CategoryName }).ToList();
                 return Ok(names);
             }
             catch

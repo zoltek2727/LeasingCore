@@ -4,6 +4,14 @@
     ViewData["Title"] = "Details";
 }
 
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Details</li>
+    </ol>
+</nav>
+
 <h2>Details</h2>
 <br />
 
@@ -11,30 +19,33 @@
     <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> Back to List
 </a>
 <div class="row">
-    <div class="col-xs-5 item-photo">
+    <div class='list-group gallery col-xs-6 '>
         @foreach (var photoItem in Model.PhotoProducts)
         {
-            @if (photoItem.PhotoProductIsDefault)
-            {
-                <img style="max-width:100%;" src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
-            }
-            else
-            {
-                <img style="max-width:33%;" src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
-            }
+            <div class="col-xs-6 item-photo">
+                <a class="thumbnail fancybox" rel="ligthbox" href="@Url.Content(photoItem.Photo.PhotoUrl)">
+                    @if (photoItem.PhotoProductIsDefault)
+                    {
+                        <img class="img-responsive" style="max-width:100%;" src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
+                    }
+                    else
+                    {
+                        <img class="img-responsive" style="max-width:33%;" src="@Url.Content(photoItem.Photo.PhotoUrl)" alt="Image" />
+                    }
+                </a>
+            </div>
         }
     </div>
+
     <div class="col-xs-4" style="border:0px solid gray">
         <h1 style="margin-top:0px;">@Html.DisplayFor(model => model.ProductName)</h1>
         <h5 style="color:#337ab7">
             @Html.DisplayFor(model => model.Category.CategoryName)
         </h5>
         <div class="row">
-            <div class="section col-lg-10" >
+            <div class="section col-lg-10">
                 <h6 class="title-attr">
-                    <small>
                         @Html.DisplayNameFor(model => model.ProductCode):
-                    </small>
                 </h6>
                 <div class="attr2 col-lg-1">
                     @Html.DisplayFor(model => model.ProductCode)
@@ -50,6 +61,7 @@
                 </div>
             }
         </div>
+
         <div class="section" style="padding-bottom:20px;">
             <h6 class="title-attr"><small>@Html.DisplayNameFor(model => model.ProductAvailability)</small></h6>
             <div>
@@ -59,7 +71,16 @@
     </div>
     <div class="col-xs-2">
         <h2 style="margin-top:0px;">
-            @Html.DisplayFor(model => model.ProductPrice) PLN
+            @{
+                decimal total = 0;
+
+                total += Model.ProductPrice;
+
+                foreach (var param in Model.ProductAssortments)
+                {
+                    total += param.Assortment.AssortmentPrice;
+                }
+            } PLN
         </h2>
         <a class="btn btn-warning pull-right" asp-controller="Cart" asp-action="Buy" asp-route-id="@Model.ProductId">
             <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add to Cart
@@ -74,3 +95,8 @@
         </small>
     </p>
 </div>
+
+@section Scripts {
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+}

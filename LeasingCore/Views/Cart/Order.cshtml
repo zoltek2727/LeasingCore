@@ -1,35 +1,95 @@
-﻿@model IEnumerable<LeasingCore.Models.Leasing>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.LeasingStart)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.LeasingStart)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.UserName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.LeasingId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.LeasingId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.LeasingId">Delete</a>
-            </td>
-        </tr>
+﻿@{
+    ViewData["Title"] = "Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    </tbody>
-</table>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Cart" asp-action="Index">Cart</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Order</li>
+    </ol>
+</nav>
+<br />
+@if (ViewBag.cart != null)
+{
+    <h2>Your order</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Price
+                </th>
+                <th>
+                    Code
+                </th>
+                <th>
+                    Quantity
+                </th>
+                <th>
+                    Sub Total
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.cart)
+            {
+                <tr>
+                    <td>
+                        @item.Product.ProductName
+                    </td>
+                    <td id="Price">
+                        @item.Product.ProductPrice
+                    </td>
+                    <td>
+                        @item.Product.ProductCode
+                    </td>
+                    <td>
+                        <input onchange="updateLabel()" id="Quantity" type="number" min="1" step="1" max="@item.Product.ProductAvailability" value="@item.Quantity" class="form-control" /> from @item.Product.ProductAvailability
+                    </td>
+                    <td id="SubTotal">
+                        @(item.Product.ProductPrice * item.Quantity)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td>
+                    <a class="btn btn-default" asp-controller="Cart" asp-action="Index">
+                        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> Return to cart
+                    </a>
+                </td>
+                <td align="right" colspan="4">Sum</td>
+                <td>
+                    @ViewBag.total
+                </td>
+                <td>
+                    <a class="btn btn-primary" asp-controller="Cart" asp-action="Leasing">
+                        <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Leasing
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+}
+else
+{
+    <h1 class="danger text-center">Your Order is empty!</h1>
+}
+<p class="text-danger">@ViewBag.ErrorMessage</p>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script type="text/javascript">
+        function updateLabel() {
+            var number = parseInt($(this).find('.Price').text(), 10);
+            var number2 = parseInt($(this).find('.Quantity').text(), 10);
+
+            var Total = number * number2;
+            document.getElementById('SubTotal').innerHTML = Total.toString();
+        }
+    </script>
+}

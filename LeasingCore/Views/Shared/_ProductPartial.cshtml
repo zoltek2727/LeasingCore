@@ -1,0 +1,16 @@
+﻿<div>
+    <ul class="nav navbar-nav">
+        <li class="dropdown">
+            <a asp-area="" asp-controller="Products" asp-action="Index">
+                <span class="glyphicon glyphicon-list-alt"></span> Products <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu" id="ctItems">
+                <li>
+                    <a asp-controller="Products" asp-action="Index">
+                        <span class="glyphicon glyphicon-hand-right"></span><span id="categorySearcher"></span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>

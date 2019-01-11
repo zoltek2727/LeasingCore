@@ -43,3 +43,25 @@ body {
 .btn.active em.glyphicon {
     opacity: 1;
 }
+
+.navbar-default .navbar-nav > li.dropdown:hover > a,
+.navbar-default .navbar-nav > li.dropdown:hover > a:hover,
+.navbar-default .navbar-nav > li.dropdown:hover > a:focus {
+    background-color: rgb(91,192,222);
+    color: white;
+}
+
+li.dropdown:hover > .dropdown-menu {
+    display: block;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    background-color: rgb(91,192,222);
+    color: white;
+}
+
+.gallery {
+    display: inline-block;
+    margin-top: 20px;
+}

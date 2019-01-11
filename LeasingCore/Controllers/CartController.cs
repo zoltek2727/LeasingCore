@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace LeasingCore.Controllers
 {
@@ -32,14 +33,42 @@ namespace LeasingCore.Controllers
             return View();
         }
 
-        [Route("Buy/{id}")]
-        public IActionResult Buy(int id)
+        [Produces("application/json")]
+        [HttpGet]
+        public async Task<IActionResult> GetCartAmount()
         {
+            var cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
+
+            var names = "0";
+
+            try
+            {
+                if (cart != null)
+                {
+                    names = cart.Count.ToString();
+                }
+
+                return Ok(names);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [Route("Buy/{id}")]
+        public IActionResult Buy(int id, string amount)
+        {
+            if(string.IsNullOrWhiteSpace(amount))
+            {
+                amount = "1";
+            }
+
             Product productModel = new Product();
             if (SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart") == null)
             {
                 var cart = new List<ShoppingCart>();
-                cart.Add(new ShoppingCart() { Product = _context.Products.Find(id), Quantity = 1 });
+                cart.Add(new ShoppingCart() { Product = _context.Products.Find(id), Quantity = Convert.ToInt32(amount) });
                 SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
             }
             else
@@ -52,11 +81,25 @@ namespace LeasingCore.Controllers
                 }
                 else
                 {
-                    cart.Add(new ShoppingCart() { Product = _context.Products.Find(id), Quantity = 1 });
+                    cart.Add(new ShoppingCart() { Product = _context.Products.Find(id), Quantity = Convert.ToInt32(amount) });
                 }
                 SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
             }
             return RedirectToAction("Index");
+        }
+
+        public IActionResult Order()
+        {
+            var cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
+            ViewBag.cart = cart;
+
+            if (cart != null)
+            {
+                ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
+                return View();
+            }
+
+            return View();
         }
 
         [Route("remove/{id}")]
@@ -90,6 +133,8 @@ namespace LeasingCore.Controllers
                     {
                         LeasingId = l.LeasingId,
                         LeasingDetailAmount = item.Quantity,
+                        LeasingDetailExtend = true,
+                        LeasingDetailEnd = DateTime.Now.AddYears(1),
                         ProductId = item.Product.ProductId
                     };
                     _context.Add(ld);
@@ -100,7 +145,7 @@ namespace LeasingCore.Controllers
             catch
             {
                 ViewBag.ErrorMessage = "Your cart can't be empty";
-                return View("Index");
+                return RedirectToAction("Index", "Leasings", new { id = _context.Leasings.Last().LeasingId });
             }
                 
             cart = null;

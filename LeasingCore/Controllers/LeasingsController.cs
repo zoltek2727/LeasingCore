@@ -156,6 +156,8 @@ namespace LeasingCore.Controllers
             var product = await _context.Products.FindAsync(leasingDetail.ProductId);
             product.ProductAvailability += leasingDetail.LeasingDetailAmount;
 
+            leasingDetail.LeasingDetailAmount = 0;
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

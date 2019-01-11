@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - LeasingCore</title>
+    <title>@ViewData["Title"] - Tech-Leasing</title>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -27,22 +27,30 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">LeasingCore</a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Tech-Leasing</a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Products" asp-action="Index">Products</a></li>
+                @*<ul class="nav navbar-nav">
+            <li class="dropdown">
+                <a asp-area="" asp-controller="Products" asp-action="Index" class="dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-list-alt"></span> Products <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">Separated link</a></li>
                 </ul>
+            </li>
+        </ul>*@
+                <partial name="_ProductPartial" />
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <ul class="nav navbar-nav">
-                        <li><a asp-area="" asp-controller="Reports" asp-action="Index">Reports</a></li>
-                    </ul>
-
                     <ul class="nav navbar-nav navbar-right">
                         <li>
-                            <a asp-area="" asp-controller="Cart" asp-action="Index">
-                                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Cart <span class="badge">7</span>
+                            <a asp-area="" asp-controller="Cart" asp-action="Index" method="get">
+                                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Cart <span id="cartAmount" class="badge" />
                             </a>
                         </li>
                     </ul>
@@ -70,6 +78,14 @@
                 <img src="~/images/banner3.svg" alt="Microsoft Azure" class="img-responsive" />
             </div>
         </div>
+        <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
     </div>
 
     <partial name="_CookieConsentPartial" />
@@ -79,7 +95,7 @@
     </div>
 
     <footer class="container modal-footer">
-        <p>&copy; 2018 - LeasingCore</p>
+        <p>&copy; @DateTime.Now.Year - Tech-Leasing</p>
     </footer>
 
     <environment include="Development">
