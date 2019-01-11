@@ -1,94 +1,101 @@
 ﻿@{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Cart";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<br />
+@if (ViewBag.cart != null)
+{
+    <h2>Your cart</h2>
 
-<h2>Your cart</h2>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Action
-            </th>
-            <th>
-                Id
-            </th>
-            <th>
-                Name
-            </th>
-            <th>
-                Price
-            </th>
-            <th>
-                Code
-            </th>
-            <th>
-                Quantity
-            </th>
-            <th>
-                Sub Total
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-
-        @if (ViewBag.cart != null)
-        {
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Id
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Price
+                </th>
+                <th>
+                    Code
+                </th>
+                <th>
+                    Quantity
+                </th>
+                <th>
+                    Sub Total
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody>
             @foreach (var item in ViewBag.cart)
             {
-                <tr>
-                    <td>
-                        <a class="btn btn-danger" asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">
-                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                        </a>
-                    </td>
-                    <td>
-                        @item.Product.ProductId
-                    </td>
-                    <td>
-                        @item.Product.ProductName
-                    </td>
-                    <td id="Price">
-                        @item.Product.ProductPrice
-                    </td>
-                    <td>
-                        @item.Product.ProductCode
-                    </td>
-                    <td>
-                        <input onchange="updateLabel()" id="Quantity" type="number" min="1" step="1" max="@item.Product.ProductAvailability" value="@item.Quantity" class="form-control" /> from @item.Product.ProductAvailability
-                    </td>
-                    <td id="SubTotal">
-                        @(item.Product.ProductPrice * item.Quantity)
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    @item.Product.ProductId
+                </td>
+                <td>
+                    @item.Product.ProductName
+                </td>
+                <td id="Price">
+                    @item.Product.ProductPrice
+                </td>
+                <td>
+                    @item.Product.ProductCode
+                </td>
+                <td>
+                    <input onchange="updateLabel()" id="Quantity" type="number" min="1" step="1" max="@item.Product.ProductAvailability" value="@item.Quantity" class="form-control" /> from @item.Product.ProductAvailability
+                </td>
+                <td id="SubTotal">
+                    @(item.Product.ProductPrice * item.Quantity)
+                </td>
+                <td>
+                    <a class="btn btn-danger" asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                    </a>
+                </td>
+            </tr>
             }
             <tr>
-                <td align="right" colspan="7">Sum</td>
+                <td>
+                    <a class="btn btn-default" asp-controller="Products" asp-action="Index">
+                        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> Continue Shopping
+                    </a>
+                </td>
+                <td align="right" colspan="4">Sum</td>
                 <td>
                     @ViewBag.total
                 </td>
+                <td>
+                    <a class="btn btn-primary" asp-controller="Cart" asp-action="Order">
+                        <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Order
+                    </a>
+                </td>
             </tr>
-        }
-
-    </tbody>
-</table>
+        </tbody>
+    </table>
+}
+else
+{
+    <h1 class="danger text-center">Your Cart is empty!</h1>
+}
 <p class="text-danger">@ViewBag.ErrorMessage</p>
-
-<br>
-<a class="btn btn-default" asp-controller="Products" asp-action="Index">
-    <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> Continue Shopping
-</a>
-<a class="btn btn-primary" asp-controller="Cart" asp-action="Leasing">
-    <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Leasing
-</a>
 
 @section Scripts {
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <script type="text/javascript">
         function updateLabel() {
-            var Total = document.getElementById('Price').value * document.getElementById('Quantity').value;
+            var number = parseInt($(this).find('.Price').text(), 10);
+            var number2 = parseInt($(this).find('.Quantity').text(), 10);
+
+            var Total = number * number2;
             document.getElementById('SubTotal').innerHTML = Total.toString();
         }
     </script>

@@ -86,10 +86,14 @@ namespace LeasingCore.Controllers
         }
 
         // GET: Reports/Create
-        public IActionResult Create(int id)
+        public IActionResult Create(int? id)
         {
-            ViewData["LeasingDetailId"] = new SelectList(_context.LeasingDetails.Where(ld=>ld.LeasingDetailId==id), "LeasingDetailId", "LeasingDetailId");
-            ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusId", "StatusName");
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["LeasingDetailId"] = id;
             return View();
         }
 

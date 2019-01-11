@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
+using System.Collections.Generic;
 
 namespace LeasingCore.Controllers
 {
