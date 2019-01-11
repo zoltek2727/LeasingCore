@@ -6,40 +6,48 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
+using ReflectionIT.Mvc.Paging;
+using Microsoft.AspNetCore.Routing;
 
 namespace LeasingCore.Controllers
 {
     public class StatusController : Controller
     {
-        private readonly LeasingContext _context;
-
-        public StatusController(LeasingContext context)
-        {
-            _context = context;
-        }
+        LeasingContext _context = new LeasingContext();
 
         // GET: Status
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "StatusName")
         {
-            return View(await _context.Statuses.ToListAsync());
+            var qry = _context.Statuses.OrderBy(c => c.StatusName).AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                qry = qry.Where(c => c.StatusName.Contains(filter));
+            }
+
+            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "StatusName");
+
+            model.RouteValue = new RouteValueDictionary {
+                { "filter", filter}
+            };
+
+            return View(model);
         }
 
-        // GET: Status/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [Produces("application/json")]
+        [HttpGet]
+        public async Task<IActionResult> Search()
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                string term = HttpContext.Request.Query["term"].ToString();
+                var names = _context.Statuses.Where(s => s.StatusName.Contains(term)).OrderBy(s => s.StatusName).Select(s => s.StatusName).ToList();
+                return Ok(names);
             }
-
-            var status = await _context.Statuses
-                .FirstOrDefaultAsync(m => m.StatusId == id);
-            if (status == null)
+            catch
             {
-                return NotFound();
+                return BadRequest();
             }
-
-            return View(status);
         }
 
         // GET: Status/Create
@@ -115,28 +123,37 @@ namespace LeasingCore.Controllers
             return View(status);
         }
 
+        //// GET: Status/Delete/5
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var status = await _context.Statuses
+        //        .FirstOrDefaultAsync(m => m.StatusId == id);
+        //    if (status == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(status);
+        //}
+
+        //// POST: Status/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    var status = await _context.Statuses.FindAsync(id);
+        //    _context.Statuses.Remove(status);
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
+
         // GET: Status/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var status = await _context.Statuses
-                .FirstOrDefaultAsync(m => m.StatusId == id);
-            if (status == null)
-            {
-                return NotFound();
-            }
-
-            return View(status);
-        }
-
-        // POST: Status/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var status = await _context.Statuses.FindAsync(id);
             _context.Statuses.Remove(status);

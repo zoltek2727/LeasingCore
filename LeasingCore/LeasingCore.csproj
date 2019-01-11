@@ -13,6 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="bootstrap" Version="4.2.1" />
+    <PackageReference Include="DinkToPdfIncludesDependencies" Version="1.0.8" />
     <PackageReference Include="jQuery.UI.Combined" Version="1.12.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.4" />
@@ -24,5 +26,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
     <PackageReference Include="ReflectionIT.Mvc.Paging" Version="3.3.0" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties wwwroot_4lib_4jquery_4_1bower_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

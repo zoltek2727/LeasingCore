@@ -1,4 +1,6 @@
-﻿using LeasingCore.Models;
+﻿using DinkToPdf;
+using DinkToPdf.Contracts;
+using LeasingCore.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using ReflectionIT.Mvc.Paging;
 
 using System;
-
 
 namespace LeasingCore
 {
@@ -75,6 +76,8 @@ namespace LeasingCore
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSession();
+
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
             services.AddPaging();
         }

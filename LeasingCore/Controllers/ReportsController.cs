@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
+using ReflectionIT.Mvc.Paging;
+using Microsoft.AspNetCore.Routing;
 
 namespace LeasingCore.Controllers
 {
@@ -14,10 +14,55 @@ namespace LeasingCore.Controllers
         LeasingContext _context = new LeasingContext();
 
         // GET: Reports
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "-ReportAdded")
         {
-            var leasingContext = _context.Reports.Include(r => r.Leasing).Include(r=>r.Leasing.LeasingDetails).Include(r => r.Status);
-            return View(await leasingContext.ToListAsync());
+            //var leasingContext = _context.Reports
+            //    .Include(r => r.LeasingDetail)
+            //    .Include(r => r.LeasingDetail.Leasing)
+            //    .Include(u => u.LeasingDetail.Leasing.User)
+            //    .Include(p => p.LeasingDetail.Product)
+            //    .Include(r => r.Status)
+            //    .OrderBy(s => s.Status.StatusId)
+            //    .OrderByDescending(r => r.ReportAdded);
+            //return View(await leasingContext.ToListAsync());
+
+            var qry = _context.Reports
+                .Include(r => r.LeasingDetail)
+                .Include(r => r.LeasingDetail.Leasing)
+                .Include(u => u.LeasingDetail.Leasing.User)
+                .Include(p => p.LeasingDetail.Product)
+                .Include(r => r.Status)
+                .OrderBy(s => s.Status.StatusId)
+                .OrderByDescending(r=>r.ReportAdded).AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                qry = qry.Where(r => r.LeasingDetail.Product.ProductName.Contains(filter));
+            }
+
+            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "-ReportAdded");
+
+            model.RouteValue = new RouteValueDictionary {
+                { "filter", filter}
+            };
+
+            return View(model);
+        }
+
+        [Produces("application/json")]
+        [HttpGet]
+        public async Task<IActionResult> Search()
+        {
+            try
+            {
+                string term = HttpContext.Request.Query["term"].ToString();
+                var names = _context.Reports.Where(r => r.LeasingDetail.Product.ProductName.Contains(term)).OrderBy(r => r.LeasingDetail.Product.ProductName).Select(r => r.LeasingDetail.Product.ProductName).ToList();
+                return Ok(names);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         // GET: Reports/Details/5
@@ -29,7 +74,7 @@ namespace LeasingCore.Controllers
             }
 
             var report = await _context.Reports
-                .Include(r => r.Leasing)
+                .Include(r => r.LeasingDetail)
                 .Include(r => r.Status)
                 .FirstOrDefaultAsync(m => m.ReportId == id);
             if (report == null)
@@ -41,10 +86,14 @@ namespace LeasingCore.Controllers
         }
 
         // GET: Reports/Create
-        public IActionResult Create()
+        public IActionResult Create(int? id)
         {
-            ViewData["LeasingId"] = new SelectList(_context.Leasings, "LeasingId", "LeasingId");
-            ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusId", "StatusName");
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["LeasingDetailId"] = id;
             return View();
         }
 
@@ -53,7 +102,7 @@ namespace LeasingCore.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReportId,ReportDescription,LeasingId,StatusId")] Report report)
+        public async Task<IActionResult> Create([Bind("ReportId,ReportDescription,ReportAdded,LeasingDetailId,StatusId")] Report report)
         {
             if (ModelState.IsValid)
             {
@@ -61,7 +110,7 @@ namespace LeasingCore.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["LeasingId"] = new SelectList(_context.Leasings, "LeasingId", "LeasingId", report.LeasingId);
+            ViewData["LeasingDetailId"] = new SelectList(_context.LeasingDetails, "LeasingDetailId", "LeasingDetailId", report.LeasingDetailId);
             ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusId", "StatusName", report.StatusId);
             return View(report);
         }
@@ -79,7 +128,7 @@ namespace LeasingCore.Controllers
             {
                 return NotFound();
             }
-            ViewData["LeasingId"] = new SelectList(_context.Leasings, "LeasingId", "LeasingId", report.LeasingId);
+            ViewData["LeasingDetailId"] = new SelectList(_context.LeasingDetails, "LeasingDetailId", "LeasingDetailId", report.LeasingDetailId);
             ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusId", "StatusName", report.StatusId);
             return View(report);
         }
@@ -89,7 +138,7 @@ namespace LeasingCore.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ReportId,ReportDescription,LeasingId,StatusId")] Report report)
+        public async Task<IActionResult> Edit(int id, [Bind("ReportId,ReportDescription,LeasingDetailId,StatusId")] Report report)
         {
             if (id != report.ReportId)
             {
@@ -116,40 +165,9 @@ namespace LeasingCore.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["LeasingId"] = new SelectList(_context.Leasings, "LeasingId", "LeasingId", report.LeasingId);
+            ViewData["LeasingDetailId"] = new SelectList(_context.LeasingDetails, "LeasingDetailId", "LeasingDetailId", report.LeasingDetailId);
             ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusId", "StatusName", report.StatusId);
             return View(report);
-        }
-
-        // GET: Reports/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var report = await _context.Reports
-                .Include(r => r.Leasing)
-                .Include(r => r.Status)
-                .FirstOrDefaultAsync(m => m.ReportId == id);
-            if (report == null)
-            {
-                return NotFound();
-            }
-
-            return View(report);
-        }
-
-        // POST: Reports/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var report = await _context.Reports.FindAsync(id);
-            _context.Reports.Remove(report);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool ReportExists(int id)

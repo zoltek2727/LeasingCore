@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,6 +13,10 @@ namespace LeasingCore.Models
         public int LeasingDetailId { get; set; }
         [Required]
         public int LeasingDetailAmount { get; set; }
+        [Required]
+        public bool LeasingDetailExtend { get; set; }
+        [Required]
+        public DateTime LeasingDetailEnd { get; set; }
 
         public int LeasingId { get; set; }
         [ForeignKey("LeasingId")]
@@ -21,6 +26,6 @@ namespace LeasingCore.Models
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
 
-        public ICollection<LeasingDetailParam> LeasingDetailParams { get; set; }
+        public ICollection<Report> Reports { get; set; }
     }
 }

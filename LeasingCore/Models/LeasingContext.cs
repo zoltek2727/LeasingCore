@@ -11,12 +11,13 @@ namespace LeasingCore.Models
         public DbSet<Report> Reports { get; set; }
         public DbSet<Leasing> Leasings { get; set; }
         public DbSet<LeasingDetail> LeasingDetails { get; set; }
-        public DbSet<LeasingDetailParam> LeasingDetailParams { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<ProductParam> ProductParams { get; set; }
+        public DbSet<ProductAssortment> ProductParams { get; set; }
         public DbSet<Param> Params { get; set; }
-        public DbSet<ParamAssortment> ParamAssortments { get; set; }
+        public DbSet<Assortment> Assortments { get; set; }
+        public DbSet<Photo> Photos { get; set; }
+        public DbSet<PhotoProduct> PhotoProducts { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

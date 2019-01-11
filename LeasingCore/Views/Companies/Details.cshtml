@@ -1,0 +1,37 @@
+﻿@model LeasingCore.Models.Company
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Company</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.CompanyName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CompanyName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CompanyHeadquarters)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CompanyHeadquarters)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CompanyNIP)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CompanyNIP)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.CompanyId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

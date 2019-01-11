@@ -141,7 +141,7 @@ namespace LeasingCore.Migrations
                     b.ToTable("Params");
                 });
 
-            modelBuilder.Entity("LeasingCore.Models.ParamAssortment", b =>
+            modelBuilder.Entity("LeasingCore.Models.Assortment", b =>
                 {
                     b.Property<int>("ParamAssortmentId")
                         .ValueGeneratedOnAdd()
@@ -328,7 +328,7 @@ namespace LeasingCore.Migrations
                         .HasForeignKey("LeasingDetailId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("LeasingCore.Models.ParamAssortment", "ParamAssortment")
+                    b.HasOne("LeasingCore.Models.Assortment", "Assortment")
                         .WithMany()
                         .HasForeignKey("ParamAssortmentId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -338,7 +338,7 @@ namespace LeasingCore.Migrations
                         .HasForeignKey("ParamId");
                 });
 
-            modelBuilder.Entity("LeasingCore.Models.ParamAssortment", b =>
+            modelBuilder.Entity("LeasingCore.Models.Assortment", b =>
                 {
                     b.HasOne("LeasingCore.Models.Param", "Param")
                         .WithMany("ParamAssortments")

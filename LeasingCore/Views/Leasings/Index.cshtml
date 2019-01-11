@@ -1,54 +1,143 @@
-﻿@model IEnumerable<LeasingCore.Models.Leasing>
+﻿@model ReflectionIT.Mvc.Paging.PagingList<LeasingCore.Models.Leasing>
+@using ReflectionIT.Mvc.Paging
+@addTagHelper *, ReflectionIT.Mvc.Paging
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Leasings";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<h2>Leasings</h2>
+<br />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.LeasingStart)
+                Show
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LeasingEnd)
+                @Html.SortableHeaderFor(model => model.LeasingStart)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LeasingExtend)
+                Details
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.LeasingStart)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LeasingEnd)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LeasingExtend)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.UserId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.LeasingId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.LeasingId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.LeasingId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr class="accordion-toggle">
+                <td><button class="btn btn-default" data-toggle="collapse" data-target="#@item.LeasingId"><span class="glyphicon glyphicon-eye-open"></span></button></td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LeasingStart)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.LeasingId" class="btn btn-info">Details</a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hiddenRow">
+                    <div id="@item.LeasingId" class="accordian-body collapse">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Product
+                                    </th>
+                                    <th>
+                                        Product code
+                                    </th>
+                                    <th>
+                                        Amount
+                                    </th>
+                                    <th>
+                                        Leasing expire date
+                                    </th>
+                                    <th>
+                                        Return
+                                    </th>
+                                    <th>
+                                        Extend
+                                    </th>
+                                    <th>
+                                        Report problem
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var ld in item.LeasingDetails)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItemLD => ld.Product.ProductName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItemLD => ld.Product.ProductCode)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItemLD => ld.LeasingDetailAmount)
+                                        </td>
+                                        <td>
+                                            @if (ld.LeasingDetailEnd < DateTime.Now)
+                                            {
+                                                <span class="glyphicon glyphicon-exclamation-sign"></span>
+                                            }
+                                            @Html.DisplayFor(modelItemLD => ld.LeasingDetailEnd)
+                                        </td>
+                                        <td>
+                                            @if (ld.LeasingDetailAmount != 0)
+                                            {
+                                                <a asp-action="Return" asp-route-id="@ld.LeasingDetailId" class="btn btn-warning" onclick="return confirm('Are you sure you want to return product?')">
+                                                    <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> Return
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="#" class="btn btn-warning disabled">
+                                                    <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> Return
+                                                </a>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (ld.LeasingDetailExtend && ld.LeasingDetailAmount != 0)
+                                            {
+                                                <a class="btn btn-primary" asp-action="Extend" asp-route-id="@ld.LeasingDetailId" onclick="return confirm('Are you sure you want to extend leasing for another year?')">
+                                                    <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span> Extend
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="#" class="btn btn-primary disabled">
+                                                    <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span> Extend
+                                                </a>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (ld.LeasingDetailAmount != 0)
+                                            {
+                                                <a asp-controller="Reports" asp-action="Create" asp-route-id="@ld.LeasingDetailId" class="btn btn-danger">
+                                                    <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Report problem
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="#" class="btn btn-danger disabled">
+                                                    <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Report problem
+                                                </a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<nav aria-label="Suppliers navigation example">
+    <vc:pager paging-list="@Model" />
+</nav>

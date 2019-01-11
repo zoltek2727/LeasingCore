@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
-
-using Microsoft.AspNetCore.Authorization;
-
+using System.Collections.Generic;
 
 namespace LeasingCore.Controllers
 {
@@ -18,39 +15,64 @@ namespace LeasingCore.Controllers
     {
         LeasingContext _context = new LeasingContext();
 
-
-        [Authorize]
-
-        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "ProductName")
+        public async Task<IActionResult> Index(string filter, string categoryFilter, int page = 1, string sortExpression = "ProductName")
         {
-            //var products = from p in dbContext.Products
-            //               select p;
-
-            //if (!String.IsNullOrEmpty(SearchString))
-            //{
-            //    products = products.Where(p=>p.ProductName.Contains(SearchString));
-            //}
-
-            //return View(await products.Include(p=>p.Category).ToListAsync());
-
-            var qry = _context.Products.AsNoTracking()
-                .Include(p => p.Category)
+            var qry = _context.Products.Where(p => p.ProductAvailability > 0).AsNoTracking()
+                .Include(c => c.Category)
+                .Include(p => p.PhotoProducts)
+                    .ThenInclude(p => p.Photo)
+                .Include(p => p.ProductAssortments)
+                    .ThenInclude(a => a.Assortment)
+                        .ThenInclude(p=>p.Param)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                qry = qry.Where(p => p.ProductName.Contains(filter));
+                if (string.IsNullOrWhiteSpace(categoryFilter))
+                {
+                    qry = qry.Where(p => p.ProductName.Contains(filter));
+                }
+                else
+                {
+                    qry = qry.Where(p => p.ProductName.Contains(filter)).Where(p => p.Category.CategoryId == Convert.ToInt32(categoryFilter));
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(categoryFilter))
+                {
+                    qry = qry.Where(p => p.Category.CategoryId == Convert.ToInt32(categoryFilter));
+                }     
             }
 
-            var model = await PagingList.CreateAsync(qry, 3, page, sortExpression, "ProductName");
+            var model = await PagingList.CreateAsync(qry, 10, page, sortExpression, "ProductName");
 
             model.RouteValue = new RouteValueDictionary {
-                { "filter", filter}
+                { "filter", filter},
+                { "categoryFilter", categoryFilter },
+                { "sortExpression", sortExpression }
             };
 
-            return View(model);
+            ViewBag.ListOfCategories = _context.Categories.OrderBy(c=>c.CategoryName).ToList();
+            ViewBag.ListOfParams = _context.Params.Include(a=>a.Assortments).OrderBy(p => p.ParamName).ToList();
 
-            //return View(await dbContext.Products.Include(p => p.Category).ToListAsync());
+            return View(model);
+        }
+
+        [Produces("application/json")]
+        [HttpGet]
+        public async Task<IActionResult> Search()
+        {
+            try
+            {
+                string term = HttpContext.Request.Query["term"].ToString();
+                var names = _context.Products.Where(p => p.ProductName.Contains(term)).Where(p=>p.ProductAvailability>0).Select(p => p.ProductName).ToList();
+                return Ok(names);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -60,8 +82,15 @@ namespace LeasingCore.Controllers
                 return NotFound();
             }
 
-            var products = await _context.ProductParams.Include(p => p.Param).Include(p => p.Product).Include(c=>c.Product.Category)
+            var products = await _context.Products
+                .Include(c=>c.Category)
+                .Include(p => p.ProductAssortments)
+                    .ThenInclude(a => a.Assortment)
+                        .ThenInclude(p => p.Param)
+                .Include(p => p.PhotoProducts)
+                    .ThenInclude(p => p.Photo)
                 .SingleOrDefaultAsync(p => p.ProductId == id);
+
             if (products == null)
             {
                 return NotFound();
@@ -72,12 +101,13 @@ namespace LeasingCore.Controllers
 
         public IActionResult Create()
         {
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,CategoryId")] Product products)
+        public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,ProductAdded,CategoryId")] Product products)
         {
             if (ModelState.IsValid)
             {
@@ -85,6 +115,7 @@ namespace LeasingCore.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", products.CategoryId);
             return View(products);
         }
 
@@ -105,7 +136,7 @@ namespace LeasingCore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,CategoryId")] Product products)
+        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,ProductAdded,CategoryId")] Product products)
         {
             if (id != products.ProductId)
             {
