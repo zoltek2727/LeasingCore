@@ -27,7 +27,7 @@ namespace PDF_Generator.Controllers
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings { Top = 10 },
                 DocumentTitle = "PDF Report",
-                Out = @"C:\Employee_Report.pdf"
+                Out = @"C:\PDF\Employee_Report.pdf"
             };
 
             var objectSettings = new ObjectSettings

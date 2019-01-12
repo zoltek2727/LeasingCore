@@ -159,7 +159,7 @@ namespace LeasingCore.Controllers
             mailMessage.From = new MailAddress("techleasingshop@gmail.com");
             mailMessage.To.Add("m.buczynski93@gmail.com");
             mailMessage.Body = "body";
-            mailMessage.Attachments.Add(new Attachment(@"C:\Employee_Report.pdf"));
+            mailMessage.Attachments.Add(new Attachment(@"C:\PDF\Employee_Report.pdf"));
             mailMessage.Subject = "subject";
             client.Send(mailMessage);
 
