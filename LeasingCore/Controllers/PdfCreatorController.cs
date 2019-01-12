@@ -26,7 +26,7 @@ namespace LeasingCore.Controllers
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings { Top = 10 },
                 DocumentTitle = "PDF Report",
-                Out = @"D:\PDF\Leasing.pdf"
+                Out = @"C:\PDF\Leasing.pdf"
             };
 
             var objectSettings = new ObjectSettings
