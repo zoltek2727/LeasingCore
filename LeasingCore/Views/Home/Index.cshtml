@@ -7,33 +7,33 @@
 <br />
 <div class="container">
     <div class="row text-center">
-        <div class="col-sm-4">
-            <div class="box bg-info">
-                <img class="img-responsive" src="~/images/paris.jpg" />
-                <h3>PODPIS</h3>
-                <p>OPIS</p>
+        <div class="col-sm-4 mi">
+            <div class="box miniaturka">
+               <a asp-controller="Products" asp-action="Index"> <img class="img-responsive" src="~/images/laptop-lenovo-thinkpad-e580-20ks007gpb_1250430_3710464_350x350w50.jpg" /></a>
+                <h3>LAPTOPS</h3>
+                <p>Minimum formalities. Quick decision.</p>
             </div>
         </div>
         <div class="col-sm-4">
-            <div class="box bg-info">
-                <img class="img-responsive" src="~/images/paris.jpg" />
-                <h3>PODPIS</h3>
-                <p>OPIS</p>
+            <div class="box miniaturka">
+                <a asp-controller="Products" asp-action="Index"><img class="img-responsive" src="~/images/monitor-lg-24mp88hv_657406_1707624_350x350w50.jpg" /></a>
+                <h3>MONITORS</h3>
+                <p> Search, compare prices and save!</p>
             </div>
         </div>
         <div class="col-sm-4">
-            <div class="box bg-info">
-                <img class="img-responsive" src="~/images/paris.jpg" />
-                <h3>PODPIS</h3>
-                <p>OPIS</p>
+            <div class="box miniaturka">
+                <a asp-controller="Products" asp-action="Index"><img class="img-responsive" src="~/images/win10-photo.png" /></a>
+                <h3>OS</h3>
+                <p>Windows 10 is even better thanks to innovative and innovative solutions.</p>
             </div>
         </div>
     </div>
 </div>
 <br />
 <div class="container text-center">
-    <h1>COS DO NAPISANIA</h1>
-    <p>asfaf pafpoj ajf poasjfpo jaspojf pajf pajfpiashf aspj fhsapi fhpisa hfio</p>
+    <h1>QUALITY</h1>
+    <p>Discover the best Laptop Computers in Best Sellers</p>
 </div>
 <br />
 <div id="myCarousel2" class="carousel slide" data-ride="carousel" data-interval="6000">
@@ -61,7 +61,7 @@
                     <div class="thumbnail" style=" width:900px; margin:0 auto; border:0;">
                         <div class="row">
                             <div class="col-xs-6">
-                                @if (item.PhotoProducts.Count > 1)
+                                @if (item.PhotoProducts.Count > 0)
                                 {
                                     @foreach (var photoItem in item.PhotoProducts)
                                     {
@@ -78,7 +78,7 @@
                             </div>
                             <div class="col-xs-6">
                                 <div class="caption">
-                                    <h3 style="margin-top:0px;">
+                                    <h3 >
                                         <a class="label label-info" asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId">
                                             @Html.DisplayFor(modelItem => item.ProductName)
                                         </a>

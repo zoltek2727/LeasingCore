@@ -4,14 +4,16 @@ using LeasingCore.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace LeasingCore.Migrations
+namespace LeasingCore.Migrations.ApplicationDb
 {
     [DbContext(typeof(LeasingContext))]
-    partial class LeasingContextModelSnapshot : ModelSnapshot
+    [Migration("20190111165548_mymigratio")]
+    partial class mymigratio
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
