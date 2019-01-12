@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LeasingCore.Controllers
 {
+    [Authorize]
     public class ParamsController : Controller
     {
         LeasingContext _context = new LeasingContext();

@@ -1,4 +1,7 @@
 ﻿using LeasingCore.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
+using System;
 using System.Linq;
 using System.Text;
 
@@ -6,45 +9,53 @@ namespace LeasingCore.Helpers
 {
     public static class TemplateGenerator
     {
-        public static string GetHTMLString()
+        public static string GetHTMLString(int id)
         {
+            decimal total = 0;
+
             LeasingContext _context = new LeasingContext();
 
             var products = _context.Products.ToList();
 
+            var leasing = _context.Leasings.Where(ld => ld.LeasingId == id)
+                .Include(l => l.LeasingDetails)
+                    .ThenInclude(l => l.Product)
+                .ToList();
+
             var sb = new StringBuilder();
-            sb.Append(@"
+            sb.AppendFormat(@"
                         <html>
                             <head>
                             </head>
                             <body>
-                                <div class='header'><h1>This is the generated PDF report!!!</h1></div>
+                                <div class='header'><h1>Order no. {0} </h1></div>
                                 <table align='center'>
                                     <tr>
-                                        <th>ProductId</th>
-                                        <th>ProductName</th>
-                                        <th>ProductDescription</th>
-                                        <th>ProductPrice</th>
-                                        <th>ProductAvailability</th>
-                                        <th>ProductCode</th>
-                                    </tr>");
-
-            foreach (var emp in products)
+                                        <th>Product Name</th>
+                                        <th>Product Price</th>
+                                        <th>Product Code</th>
+                                        <th>Amount</th>
+                                        <th>Total</th>
+                                    </tr>",id);
+            foreach (var ld in leasing)
             {
-                sb.AppendFormat(@"<tr>
+                foreach (var l in ld.LeasingDetails)
+                {
+                    sb.AppendFormat(@"<tr>
                                     <td>{0}</td>
                                     <td>{1}</td>
                                     <td>{2}</td>
                                     <td>{3}</td>
                                     <td>{4}</td>
-                                    <td>{5}</td>
-                                  </tr>", emp.ProductId, emp.ProductName, emp.ProductDescription, emp.ProductPrice, emp.ProductAvailability, emp.ProductCode);
+                                  </tr>", l.Product.ProductName, l.Product.ProductPrice, l.Product.ProductCode, l.LeasingDetailAmount, l.LeasingDetailAmount * l.Product.ProductPrice);
+                    total += l.LeasingDetailAmount * l.Product.ProductPrice;
+                }
             }
 
-            sb.Append(@"
+            sb.AppendFormat(@"<tr><td colspan='4'></td><td></td>{0}</tr>
                                 </table>
                             </body>
-                        </html>");
+                        </html>",total);
 
             return sb.ToString();
         }

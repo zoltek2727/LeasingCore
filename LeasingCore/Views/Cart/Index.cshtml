@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<LeasingCore.Models.Product>
+
+@{
     ViewData["Title"] = "Cart";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -7,85 +9,116 @@
 {
     <h2>Your cart</h2>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    Id
-                </th>
-                <th>
-                    Name
-                </th>
-                <th>
-                    Price
-                </th>
-                <th>
-                    Code
-                </th>
-                <th>
-                    Quantity
-                </th>
-                <th>
-                    Sub Total
-                </th>
-                <th>
-                    Action
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in ViewBag.cart)
-            {
-            <tr>
-                <td>
-                    @item.Product.ProductId
-                </td>
-                <td>
-                    @item.Product.ProductName
-                </td>
-                <td id="Price">
-                    @item.Product.ProductPrice
-                </td>
-                <td>
-                    @item.Product.ProductCode
-                </td>
-                <td>
-                    <input onchange="updateLabel()" id="Quantity" type="number" min="1" step="1" max="@item.Product.ProductAvailability" value="@item.Quantity" class="form-control" /> from @item.Product.ProductAvailability
-                </td>
-                <td id="SubTotal">
-                    @(item.Product.ProductPrice * item.Quantity)
-                </td>
-                <td>
-                    <a class="btn btn-danger" asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">
-                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                    </a>
-                </td>
-            </tr>
-            }
-            <tr>
-                <td>
-                    <a class="btn btn-default" asp-controller="Products" asp-action="Index">
-                        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> Continue Shopping
-                    </a>
-                </td>
-                <td align="right" colspan="4">Sum</td>
-                <td>
-                    @ViewBag.total
-                </td>
-                <td>
-                    <a class="btn btn-primary" asp-controller="Cart" asp-action="Order">
-                        <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Order
-                    </a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th class="text-center">Price</th>
+                            <th class="text-center">Total</th>
+                            <th> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            decimal totalSum = 0;
+                        }
+
+                        @foreach (var item in ViewBag.cart)
+                        {
+                            <tr>
+                                <td class="col-sm-8 col-md-6">
+                                    <div class="media">
+                                        @foreach (var photo in Model.Where(x => x.ProductId == item.Product.ProductId))
+                                        {
+                                            @if (photo.PhotoProducts.Count > 1)
+                                            {
+                                                @foreach (var photo2 in photo.PhotoProducts.Where(p => p.ProductId == item.Product.ProductId))
+                                                {
+                                                    @if (photo2.PhotoProductIsDefault)
+                                                    {
+                                                        <a class="thumbnail pull-left" href="#"> <img class="media-object" src="@photo2.Photo.PhotoUrl" style="width: 72px; height: 72px;"> </a>
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <a class="thumbnail pull-left" href="#"> <img class="media-object" src="~/images/emptyProduct.jpg" style="width: 72px; height: 72px;"> </a>
+                                            }
+                                        }
+                                        <div class="media-body">
+                                            <h4 class="media-heading"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h4>
+                                            <h5 class="media-heading"> code <b>@item.Product.ProductCode</b></h5>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="col-sm-1 col-md-1" style="text-align: center">
+                                    <input id="@item.Product.ProductId" type="number" min="1" step="1" max="@item.Product.ProductAvailability" value="@item.Quantity" class="form-control" /> from @item.Product.ProductAvailability
+                                </td>
+                                <td class="col-sm-2 col-md-2 text-center">
+                                    <strong id="onePrice">
+                                        @{
+                                            decimal total = 0;
+
+                                            total += item.Product.ProductPrice;
+
+                                            foreach (var param in Model.Where(p => p.ProductId == item.Product.ProductId))
+                                            {
+                                                @foreach (var paramTotal in param.ProductAssortments.Where(p => p.ProductId == item.Product.ProductId))
+                                                {
+                                                    total += paramTotal.Assortment.AssortmentPrice;
+                                                }
+                                            }
+                                        }
+                                        @total PLN
+                                    </strong>
+                                </td>
+                                <td class="col-sm-2 col-md-2 text-center"><strong id="@item.Product.ProductId">@(total * item.Quantity) PLN</strong></td>
+                                <td class="col-sm-2 col-md-2">
+                                    <a class="btn btn-danger" asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">
+                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                                    </a>
+                                </td>
+                            </tr>
+                                                totalSum += total * item.Quantity;
+                                            }
+                        <tr>
+                            <td>   </td>
+                            <td>   </td>
+                            <td>   </td>
+                            <td class="text-right" colspan="2"><h3>Total: <strong>@totalSum PLN</strong></h3></td>
+                        </tr>
+                        <tr>
+                            <td>   </td>
+                            <td>   </td>
+                            <td>   </td>
+                            <td>
+                                <a class="btn btn-default" asp-controller="Products" asp-action="Index">
+                                    <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> Continue Shopping
+                                </a>
+                            </td>
+                            <td>
+                                <a class="btn btn-primary" asp-controller="Cart" asp-action="Order">
+                                    <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Order
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 }
 else
 {
     <h1 class="danger text-center">Your Cart is empty!</h1>
 }
 <p class="text-danger">@ViewBag.ErrorMessage</p>
+
+<div id="divResult"></div>
 
 @section Scripts {
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -98,5 +131,18 @@ else
             var Total = number * number2;
             document.getElementById('SubTotal').innerHTML = Total.toString();
         }
+
+        $(document).ready(function () {
+            $('input').change(function () {
+
+                alert($(this).val());
+                alert($(this).attr('id'));
+                alert($('#onePrice').innerHTML())
+                
+
+
+                $('#divResult').html(result);
+            });
+        });
     </script>
 }

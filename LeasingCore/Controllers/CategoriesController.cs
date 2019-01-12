@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LeasingCore.Controllers
 {
@@ -12,6 +13,7 @@ namespace LeasingCore.Controllers
     {
         LeasingContext _context = new LeasingContext();
 
+        [Authorize]
         // GET: Categories
         public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "CategoryName")
         {
@@ -47,6 +49,7 @@ namespace LeasingCore.Controllers
             }
         }
 
+        [Authorize]
         // GET: Categories/Create
         public IActionResult Create()
         {
@@ -69,6 +72,7 @@ namespace LeasingCore.Controllers
             return View(category);
         }
 
+        [Authorize]
         // GET: Categories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -119,35 +123,6 @@ namespace LeasingCore.Controllers
             }
             return View(category);
         }
-
-        //// GET: Categories/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var category = await _context.Categories
-        //        .FirstOrDefaultAsync(m => m.CategoryId == id);
-        //    if (category == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(category);
-        //}
-
-        //// POST: Categories/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var category = await _context.Categories.FindAsync(id);
-        //    _context.Categories.Remove(category);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
 
         // GET: Categories/Delete/5
         public async Task<IActionResult> Delete(int id)

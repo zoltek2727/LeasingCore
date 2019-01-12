@@ -21,20 +21,29 @@ $(document).ready(function () {
     });
 });
 
-var select = $("#ddlScheme");
+$(document).ready(function () {
+    //FANCYBOX
+    //https://github.com/fancyapps/fancyBox
+    $(".fancybox").fancybox({
+        openEffect: "none",
+        closeEffect: "none"
+    });
+});
 
-//var serverResponse = [
-//    {
-//        Description: "foo"
-//    },
-//    {
-//        Description: "bar"
-//    }
-//];
-
-//$.each(serverResponse, function (i, item) {
-//    select.append("<option value='" + item.Description + "'>" + item.Description + "</option>");
-//});
+$.ajax({
+    type: "GET",
+    url: "/Cart/GetCartAmount",
+    contentType: "application/json",
+    dataType: "json",
+    success: function (response) {
+        var cartAmount = $("#cartAmount");
+        cartAmount.empty();
+        $('<a href="/Cart/Index" method="get">').append('<span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Cart <span class="badge">' + response + '</span>').appendTo(cartAmount);
+    },
+    failure: function (response) {
+        alert(response);
+    }
+});
 
 $.ajax({
     type: "GET",
@@ -42,20 +51,13 @@ $.ajax({
     contentType: "application/json",
     dataType: "json",
     success: function (response) {
-        var ctItems = $("#ctItems");
-        ctItems.empty();
+        var categoriesDDL = $("#categoriesDDL");
+        categoriesDDL.empty();
         $.each(response, function (i, item) {
-            var $tr = $('<li>', '<a>', '#categorySearcher').append(item.categoryName).appendTo(ctItems);
+            $('<li>').append('<a href="/Products/Index?categoryFilter=' + item.categoryId + '"><span class="glyphicon glyphicon-hand-right"></span> ' + item.categoryName + '</option>').appendTo(categoriesDDL);
         });
     },
     failure: function (response) {
         alert(response);
     }
-});
-
-$(document).ready(function () {
-    $(".fancybox").fancybox({
-        openEffect: "none",
-        closeEffect: "none"
-    });
 });

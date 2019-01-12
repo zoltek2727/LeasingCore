@@ -32,7 +32,7 @@
                 @Html.SortableHeaderFor(model => model.ReportAdded)
             </th>
             <th>
-                @Html.SortableHeaderFor(model => model.LeasingDetail.Leasing.User)
+                @Html.SortableHeaderFor(model => model.LeasingDetail.Leasing.ApplicationUser)
             </th>
             <th>
                 @Html.SortableHeaderFor(model => model.Status)
@@ -64,7 +64,7 @@
                     @Html.DisplayFor(modelItem => item.ReportAdded)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LeasingDetail.Leasing.User.UserName)
+                    
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Status.StatusName)

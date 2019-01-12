@@ -15,7 +15,7 @@ namespace LeasingCore.Controllers
     {
         LeasingContext _context = new LeasingContext();
 
-        public async Task<IActionResult> Index(string filter, string categoryFilter, int page = 1, string sortExpression = "ProductName")
+        public async Task<IActionResult> Index(string filter, string categoryFilter, List<string> Procesor, int page = 1, string sortExpression = "ProductName")
         {
             var qry = _context.Products.Where(p => p.ProductAvailability > 0).AsNoTracking()
                 .Include(c => c.Category)
@@ -25,6 +25,14 @@ namespace LeasingCore.Controllers
                     .ThenInclude(a => a.Assortment)
                         .ThenInclude(p=>p.Param)
                 .AsQueryable();
+
+            List<string> k = Procesor;
+
+            if(k.Count!=0)
+            {
+                //var movies = _db.Movies.Where(p => p.Genres.Intersect(listOfGenres).Any());
+                //qry = _context.Products.Where(p=>p.ProductAssortments)
+            }
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
