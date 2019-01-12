@@ -162,6 +162,7 @@ namespace LeasingCore.Controllers
             mailMessage.From = new MailAddress("mail@gmail.com");
             mailMessage.To.Add("mail@wp.pl");
             mailMessage.Body = "body";
+            mailMessage.Attachments.Add(new Attachment(@"C:\PDF\Leasing.pdf"));
             mailMessage.Subject = "subject";
             client.Send(mailMessage);
 
