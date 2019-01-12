@@ -116,12 +116,11 @@ namespace LeasingCore.Controllers
         {
             List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
 
-            try
+
+            Leasing l = new Leasing
             {
-                Leasing l = new Leasing
-                {
-                    LeasingStart = DateTime.Now,
-                    UserId = 1
+                LeasingStart = DateTime.Now,
+                    UserId = 6
                 };
                 _context.Add(l);
 
@@ -141,12 +140,10 @@ namespace LeasingCore.Controllers
                 }
 
                 _context.SaveChanges();
-            }
-            catch
-            {
-                ViewBag.ErrorMessage = "Your cart can't be empty";
-                return RedirectToAction("Index", "Leasings", new { id = _context.Leasings.Last().LeasingId });
-            }
+            
+            
+                
+            
                 
             cart = null;
             SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
@@ -156,14 +153,17 @@ namespace LeasingCore.Controllers
             client.Port = 587;
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential("mail@gmail.com", "haslo");
+            client.Credentials = new NetworkCredential("techleasingshop@gmail.com", "dup@1234");
 
             MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress("mail@gmail.com");
-            mailMessage.To.Add("mail@wp.pl");
+            mailMessage.From = new MailAddress("techleasingshop@gmail.com");
+            mailMessage.To.Add("m.buczynski93@gmail.com");
             mailMessage.Body = "body";
+            mailMessage.Attachments.Add(new Attachment(@"C:\Employee_Report.pdf"));
             mailMessage.Subject = "subject";
             client.Send(mailMessage);
+
+            
 
             return RedirectToAction("Index", "Leasings");
         }
