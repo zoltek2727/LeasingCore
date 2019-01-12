@@ -14,9 +14,9 @@ namespace LeasingCore.Models
         [Required]
         public DateTime LeasingStart { get; set; }
 
-        public int UserId { get; set; }
-        [ForeignKey("UserId")]
-        public User User { get; set; }
+        public string Id { get; set; }
+        [ForeignKey("Id")]
+        public ApplicationUser ApplicationUser { get; set; }
 
         public ICollection<LeasingDetail> LeasingDetails { get; set; }
     }

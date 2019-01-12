@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LeasingCore.Controllers
 {
+    [Authorize]
     public class ReportsController : Controller
     {
         LeasingContext _context = new LeasingContext();
@@ -28,8 +30,7 @@ namespace LeasingCore.Controllers
 
             var qry = _context.Reports
                 .Include(r => r.LeasingDetail)
-                .Include(r => r.LeasingDetail.Leasing)
-                .Include(u => u.LeasingDetail.Leasing.User)
+                    .ThenInclude(a=>a.Leasing)
                 .Include(p => p.LeasingDetail.Product)
                 .Include(r => r.Status)
                 .OrderBy(s => s.Status.StatusId)

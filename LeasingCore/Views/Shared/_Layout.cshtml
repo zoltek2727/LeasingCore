@@ -30,43 +30,21 @@
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Tech-Leasing</a>
             </div>
             <div class="navbar-collapse collapse">
-                @*<ul class="nav navbar-nav">
-            <li class="dropdown">
-                <a asp-area="" asp-controller="Products" asp-action="Index" class="dropdown-toggle" data-toggle="dropdown">
-                    <span class="glyphicon glyphicon-list-alt"></span> Products <b class="caret"></b>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">Separated link</a></li>
-                </ul>
-            </li>
-        </ul>*@
                 <partial name="_ProductPartial" />
+                <partial name="_SearchPartial" />
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <a asp-area="" asp-controller="Cart" asp-action="Index" method="get">
-                                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Cart <span id="cartAmount" class="badge" />
-                            </a>
+                    <ul class="nav navbar-nav navbar-left">
+                        <li id="cartAmount">
                         </li>
                     </ul>
                 }
-                <partial name="_SearchPartial" />
                 <partial name="_LoginPartial" />
             </div>
         </div>
     </nav>
 
     <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
-        <ol class="carousel-indicators">
-            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-            <li data-target="#myCarousel" data-slide-to="1"></li>
-            <li data-target="#myCarousel" data-slide-to="2"></li>
-        </ol>
         <div class="carousel-inner" role="listbox">
             <div class="item active">
                 <img src="~/images/banner1.svg" alt="ASP.NET" class="img-responsive" />
@@ -94,8 +72,10 @@
         @RenderBody()
     </div>
 
-    <footer class="container modal-footer">
-        <p>&copy; @DateTime.Now.Year - Tech-Leasing</p>
+    <footer class="modal-footer navbar-default">
+        <div class="container">
+            <p>&copy; @DateTime.Now.Year - Tech-Leasing</p>
+        </div>
     </footer>
 
     <environment include="Development">

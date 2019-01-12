@@ -21,6 +21,6 @@ namespace LeasingCore.Models
         [RegularExpression(@"^\d$")]
         public string CompanyNIP { get; set; }
 
-        public ICollection<User> Users { get; set; }
+        public ICollection<ApplicationUser> ApplicationUsers { get; set; }
     }
 }

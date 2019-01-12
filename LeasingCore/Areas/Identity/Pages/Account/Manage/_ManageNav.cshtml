@@ -1,0 +1,20 @@
+﻿@inject SignInManager<ApplicationUser> SignInManager
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
+<ul class="nav nav-pills nav-stacked">
+    <li class="@ManageNavPages.IndexNavClass(ViewContext)"><a asp-page="./Index">Profile</a></li>
+    <li class="@ManageNavPages.ChangePasswordNavClass(ViewContext)"><a id="change-password" asp-page="./ChangePassword">Password</a></li>
+    @if (hasExternalLogins)
+    {
+        <li class="@ManageNavPages.ExternalLoginsNavClass(ViewContext)"><a id="external-login" asp-page="./ExternalLogins">External logins</a></li>
+    }
+    <li class="@ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)"><a asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
+    <li class="@ManageNavPages.PersonalDataNavClass(ViewContext)"><a asp-page="./PersonalData">Personal data</a></li>
+    <li class=""><a asp-controller="Assortments" asp-action="Index">Assortments</a></li>
+    <li class=""><a asp-controller="Categories" asp-action="Index">Categories</a></li>
+    <li class=""><a asp-controller="Companies" asp-action="Index">Companies</a></li>
+    <li class=""><a asp-controller="Params" asp-action="Index">Params</a></li>
+    <li class=""><a asp-controller="ProductsAdmin" asp-action="Index">Products</a></li>
+    <li class=""><a asp-controller="Status" asp-action="Index">Statuses</a></li>
+</ul>

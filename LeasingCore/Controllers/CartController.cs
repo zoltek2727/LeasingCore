@@ -2,20 +2,31 @@
 using LeasingCore.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace LeasingCore.Controllers
 {
+    [Authorize]
     public class CartController : Controller
     {
         LeasingContext _context = new LeasingContext();
+
+        private UserManager<ApplicationUser> _userManager;
+
+        public CartController(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
 
         // GET: Cart
         [Authorize]
@@ -26,8 +37,17 @@ namespace LeasingCore.Controllers
 
             if (cart != null)
             {
+                var products = _context.Products.Where(p => p.ProductAvailability > 0).AsNoTracking()
+                                                .Include(c => c.Category)
+                                                .Include(p => p.PhotoProducts)
+                                                    .ThenInclude(p => p.Photo)
+                                                .Include(p => p.ProductAssortments)
+                                                    .ThenInclude(a => a.Assortment)
+                                                        .ThenInclude(p => p.Param)
+                                                .AsQueryable();
+
                 ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
-                return View();
+                return View(products);
             }
 
             return View();
@@ -95,8 +115,17 @@ namespace LeasingCore.Controllers
 
             if (cart != null)
             {
+                var products = _context.Products.Where(p => p.ProductAvailability > 0).AsNoTracking()
+                                                .Include(c => c.Category)
+                                                .Include(p => p.PhotoProducts)
+                                                    .ThenInclude(p => p.Photo)
+                                                .Include(p => p.ProductAssortments)
+                                                    .ThenInclude(a => a.Assortment)
+                                                        .ThenInclude(p => p.Param)
+                                                .AsQueryable();
+
                 ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
-                return View();
+                return View(products);
             }
 
             return View();
@@ -112,16 +141,18 @@ namespace LeasingCore.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult Leasing()
+        public async Task<IActionResult> Leasing()
         {
             List<ShoppingCart> cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
+
+            var id = _userManager.GetUserId(User);
 
             try
             {
                 Leasing l = new Leasing
                 {
                     LeasingStart = DateTime.Now,
-                    UserId = 1
+                    Id = id
                 };
                 _context.Add(l);
 
@@ -137,8 +168,32 @@ namespace LeasingCore.Controllers
                         LeasingDetailEnd = DateTime.Now.AddYears(1),
                         ProductId = item.Product.ProductId
                     };
+                    var product = _context.Products.Where(p => p.ProductId == item.Product.ProductId).ToList();
+                    foreach(var prod in product)
+                    {
+                        prod.ProductAvailability -= item.Quantity;
+                    }
+
                     _context.Add(ld);
                 }
+
+                SmtpClient client = new SmtpClient();
+                client.Host = "smtp.gmail.com";
+                client.Port = 587;
+                client.EnableSsl = true;
+                client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential("techleasingshop@gmail.com", "dup@1234");
+
+                var user = await _userManager.GetUserAsync(User);
+                var email = user.Email;
+
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress("techleasingshop@gmail.com");
+                mailMessage.To.Add(email);
+                mailMessage.Body = "Order no. "+l.LeasingId;
+                mailMessage.Subject = "Your order is completed. Please pay your bill.";
+                mailMessage.Attachments.Add(new Attachment(@"C:\PDF\Leasing.pdf"));
+                client.Send(mailMessage);
 
                 _context.SaveChanges();
             }
@@ -150,21 +205,6 @@ namespace LeasingCore.Controllers
                 
             cart = null;
             SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
-
-            SmtpClient client = new SmtpClient();
-            client.Host = "smtp.gmail.com";
-            client.Port = 587;
-            client.EnableSsl = true;
-            client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential("mail@gmail.com", "haslo");
-
-            MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress("mail@gmail.com");
-            mailMessage.To.Add("mail@wp.pl");
-            mailMessage.Body = "body";
-            mailMessage.Attachments.Add(new Attachment(@"C:\PDF\Leasing.pdf"));
-            mailMessage.Subject = "subject";
-            client.Send(mailMessage);
 
             return RedirectToAction("Index", "Leasings");
         }

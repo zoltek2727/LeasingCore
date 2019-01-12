@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +6,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
+using System.IO;
+using System.Text;
+using System.Reflection.Metadata;
+using System.Net.Mail;
+using System.Net;
 
 namespace LeasingCore.Controllers
 {
@@ -14,19 +21,23 @@ namespace LeasingCore.Controllers
     {
         LeasingContext _context = new LeasingContext();
 
+        private UserManager<ApplicationUser> _userManager;
+
+        public LeasingsController(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
         // GET: Leasings
+        [Authorize]
         public async Task<IActionResult> Index(int page = 1, string sortExpression = "LeasingStart")
         {
-            //var leasingContext = _context.Leasings
-            //    .Include(l => l.User)
-            //    .Include(l => l.LeasingDetails)
-            //        .ThenInclude(p => p.Product);
-            //return View(await leasingContext.ToListAsync());
+            var id = _userManager.GetUserId(User);
 
             var qry = _context.Leasings            
-                .Include(l => l.User)
                 .Include(l => l.LeasingDetails)
                     .ThenInclude(p => p.Product)
+                .Where(l => l.Id == id)
                 .OrderByDescending(l => l.LeasingStart)
                 .AsNoTracking().AsQueryable();
 
@@ -36,6 +47,7 @@ namespace LeasingCore.Controllers
         }
 
         // GET: Leasings/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,7 +56,7 @@ namespace LeasingCore.Controllers
             }
 
             var leasing = await _context.Leasings
-                .Include(l => l.User)
+                .Include(l => l.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.LeasingId == id);
             if (leasing == null)
             {
@@ -57,7 +69,7 @@ namespace LeasingCore.Controllers
         // GET: Leasings/Create
         public IActionResult Create()
         {
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "UserId");
+            ViewData["Id"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
             return View();
         }
 
@@ -66,7 +78,7 @@ namespace LeasingCore.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LeasingId,LeasingStart,LeasingEnd,LeasingExtend,UserId")] Leasing leasing)
+        public async Task<IActionResult> Create([Bind("LeasingId,LeasingStart,LeasingEnd,LeasingExtend,Id")] Leasing leasing)
         {
             if (ModelState.IsValid)
             {
@@ -74,7 +86,7 @@ namespace LeasingCore.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "UserId", leasing.UserId);
+            ViewData["Id"] = new SelectList(_context.ApplicationUsers, "Id", "Id", leasing.Id);
             return View(leasing);
         }
 
@@ -91,7 +103,7 @@ namespace LeasingCore.Controllers
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "UserId", leasing.UserId);
+            ViewData["Id"] = new SelectList(_context.ApplicationUsers, "Id", "Id", leasing.Id);
             return View(leasing);
         }
 
@@ -100,7 +112,7 @@ namespace LeasingCore.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LeasingId,LeasingStart,LeasingEnd,LeasingExtend,UserId")] Leasing leasing)
+        public async Task<IActionResult> Edit(int id, [Bind("LeasingId,LeasingStart,LeasingEnd,LeasingExtend,Id")] Leasing leasing)
         {
             if (id != leasing.LeasingId)
             {
@@ -127,7 +139,7 @@ namespace LeasingCore.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "UserId", leasing.UserId);
+            ViewData["Id"] = new SelectList(_context.ApplicationUsers, "Id", "Id", leasing.Id);
             return View(leasing);
         }
 

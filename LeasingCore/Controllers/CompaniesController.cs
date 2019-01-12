@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeasingCore.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LeasingCore.Controllers
 {
+    [Authorize]
     public class CompaniesController : Controller
     {
         LeasingContext _context = new LeasingContext();
