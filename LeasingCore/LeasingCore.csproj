@@ -10,6 +10,7 @@
     <Compile Remove="Migrations\20181203230410_InitialCreate.cs" />
     <Compile Remove="Migrations\20181203230410_InitialCreate.Designer.cs" />
     <Compile Remove="Migrations\ApplicationDbContextModelSnapshot.cs" />
+    <Compile Remove="Models\Pdf.cs" />
   </ItemGroup>
 
   <ItemGroup>
