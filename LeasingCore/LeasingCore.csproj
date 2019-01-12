@@ -14,14 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\images\techleasing.png" />
-    <Content Remove="wwwroot\images\techprofits.png" />
-    <Content Remove="wwwroot\images\techsupport.png" />
-    <Content Remove="wwwroot\images\twitter_header_photo_1.png" />
-    <Content Remove="wwwroot\images\twitter_header_photo_2.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="bootstrap" Version="4.2.1" />
     <PackageReference Include="DinkToPdfIncludesDependencies" Version="1.0.8" />
     <PackageReference Include="jQuery.UI.Combined" Version="1.12.1" />
