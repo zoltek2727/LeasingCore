@@ -19,31 +19,6 @@ namespace LeasingCore.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("LeasingCore.Models.Assortment", b =>
-                {
-                    b.Property<int>("AssortmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("AssortmentBrand")
-                        .IsRequired()
-                        .HasMaxLength(30);
-
-                    b.Property<string>("AssortmentName")
-                        .IsRequired()
-                        .HasMaxLength(80);
-
-                    b.Property<decimal>("AssortmentPrice");
-
-                    b.Property<int>("ParamId");
-
-                    b.HasKey("AssortmentId");
-
-                    b.HasIndex("ParamId");
-
-                    b.ToTable("Assortments");
-                });
-
             modelBuilder.Entity("LeasingCore.Models.Category", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -88,11 +63,19 @@ namespace LeasingCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("LeasingEnd");
+
+                    b.Property<bool>("LeasingExtend");
+
                     b.Property<DateTime>("LeasingStart");
+
+                    b.Property<int>("ProductId");
 
                     b.Property<int>("UserId");
 
                     b.HasKey("LeasingId");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("UserId");
 
@@ -107,10 +90,6 @@ namespace LeasingCore.Migrations
 
                     b.Property<int>("LeasingDetailAmount");
 
-                    b.Property<DateTime>("LeasingDetailEnd");
-
-                    b.Property<bool>("LeasingDetailExtend");
-
                     b.Property<int>("LeasingId");
 
                     b.Property<int?>("ProductId");
@@ -122,6 +101,29 @@ namespace LeasingCore.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("LeasingDetails");
+                });
+
+            modelBuilder.Entity("LeasingCore.Models.LeasingDetailParam", b =>
+                {
+                    b.Property<int>("LeasingDetailParamId")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("LeasingDetailId");
+
+                    b.Property<int>("ParamAssortmentId");
+
+                    b.Property<int?>("ParamId");
+
+                    b.HasKey("LeasingDetailParamId");
+
+                    b.HasIndex("LeasingDetailId");
+
+                    b.HasIndex("ParamAssortmentId");
+
+                    b.HasIndex("ParamId");
+
+                    b.ToTable("LeasingDetailParams");
                 });
 
             modelBuilder.Entity("LeasingCore.Models.Param", b =>
@@ -139,39 +141,27 @@ namespace LeasingCore.Migrations
                     b.ToTable("Params");
                 });
 
-            modelBuilder.Entity("LeasingCore.Models.Photo", b =>
+            modelBuilder.Entity("LeasingCore.Models.Assortment", b =>
                 {
-                    b.Property<int>("PhotoId")
+                    b.Property<int>("ParamAssortmentId")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("PhotoUrl")
-                        .IsRequired();
+                    b.Property<string>("ParamAssortmentBrand")
+                        .IsRequired()
+                        .HasMaxLength(30);
 
-                    b.HasKey("PhotoId");
+                    b.Property<string>("ParamAssortmentName")
+                        .IsRequired()
+                        .HasMaxLength(80);
 
-                    b.ToTable("Photos");
-                });
+                    b.Property<int>("ParamId");
 
-            modelBuilder.Entity("LeasingCore.Models.PhotoProduct", b =>
-                {
-                    b.Property<int>("PhotoProductId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.HasKey("ParamAssortmentId");
 
-                    b.Property<int>("PhotoId");
+                    b.HasIndex("ParamId");
 
-                    b.Property<bool>("PhotoProductIsDefault");
-
-                    b.Property<int>("ProductId");
-
-                    b.HasKey("PhotoProductId");
-
-                    b.HasIndex("PhotoId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("PhotoProducts");
+                    b.ToTable("ParamAssortments");
                 });
 
             modelBuilder.Entity("LeasingCore.Models.Product", b =>
@@ -182,14 +172,10 @@ namespace LeasingCore.Migrations
 
                     b.Property<int>("CategoryId");
 
-                    b.Property<DateTime>("ProductAdded");
-
                     b.Property<int>("ProductAvailability");
 
                     b.Property<string>("ProductCode")
                         .IsRequired();
-
-                    b.Property<string>("ProductDescription");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
@@ -204,23 +190,23 @@ namespace LeasingCore.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("LeasingCore.Models.ProductAssortment", b =>
+            modelBuilder.Entity("LeasingCore.Models.ProductParam", b =>
                 {
-                    b.Property<int>("ProductAssortmentId")
+                    b.Property<int>("ProductParamId")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AssortmentId");
+                    b.Property<int>("ParamId");
 
                     b.Property<int>("ProductId");
 
-                    b.HasKey("ProductAssortmentId");
+                    b.HasKey("ProductParamId");
 
-                    b.HasIndex("AssortmentId");
+                    b.HasIndex("ParamId");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductAssortments");
+                    b.ToTable("ProductParams");
                 });
 
             modelBuilder.Entity("LeasingCore.Models.Report", b =>
@@ -229,9 +215,7 @@ namespace LeasingCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("LeasingDetailId");
-
-                    b.Property<DateTime>("ReportAdded");
+                    b.Property<int>("LeasingId");
 
                     b.Property<string>("ReportDescription")
                         .IsRequired()
@@ -241,7 +225,7 @@ namespace LeasingCore.Migrations
 
                     b.HasKey("ReportId");
 
-                    b.HasIndex("LeasingDetailId");
+                    b.HasIndex("LeasingId");
 
                     b.HasIndex("StatusId");
 
@@ -312,16 +296,13 @@ namespace LeasingCore.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("LeasingCore.Models.Assortment", b =>
-                {
-                    b.HasOne("LeasingCore.Models.Param", "Param")
-                        .WithMany("Assortments")
-                        .HasForeignKey("ParamId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("LeasingCore.Models.Leasing", b =>
                 {
+                    b.HasOne("LeasingCore.Models.Product", "Product")
+                        .WithMany("Leasings")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("LeasingCore.Models.User", "User")
                         .WithMany("Leasings")
                         .HasForeignKey("UserId")
@@ -340,16 +321,28 @@ namespace LeasingCore.Migrations
                         .HasForeignKey("ProductId");
                 });
 
-            modelBuilder.Entity("LeasingCore.Models.PhotoProduct", b =>
+            modelBuilder.Entity("LeasingCore.Models.LeasingDetailParam", b =>
                 {
-                    b.HasOne("LeasingCore.Models.Photo", "Photo")
-                        .WithMany("PhotoProducts")
-                        .HasForeignKey("PhotoId")
+                    b.HasOne("LeasingCore.Models.LeasingDetail", "LeasingDetail")
+                        .WithMany("LeasingDetailParams")
+                        .HasForeignKey("LeasingDetailId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("LeasingCore.Models.Product", "Product")
-                        .WithMany("PhotoProducts")
-                        .HasForeignKey("ProductId")
+                    b.HasOne("LeasingCore.Models.Assortment", "Assortment")
+                        .WithMany()
+                        .HasForeignKey("ParamAssortmentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("LeasingCore.Models.Param", "Param")
+                        .WithMany()
+                        .HasForeignKey("ParamId");
+                });
+
+            modelBuilder.Entity("LeasingCore.Models.Assortment", b =>
+                {
+                    b.HasOne("LeasingCore.Models.Param", "Param")
+                        .WithMany("ParamAssortments")
+                        .HasForeignKey("ParamId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -361,24 +354,24 @@ namespace LeasingCore.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("LeasingCore.Models.ProductAssortment", b =>
+            modelBuilder.Entity("LeasingCore.Models.ProductParam", b =>
                 {
-                    b.HasOne("LeasingCore.Models.Assortment", "Assortment")
-                        .WithMany("ProductAssortments")
-                        .HasForeignKey("AssortmentId")
+                    b.HasOne("LeasingCore.Models.Param", "Param")
+                        .WithMany("ProductParams")
+                        .HasForeignKey("ParamId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("LeasingCore.Models.Product", "Product")
-                        .WithMany("ProductAssortments")
+                        .WithMany("ProductParams")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("LeasingCore.Models.Report", b =>
                 {
-                    b.HasOne("LeasingCore.Models.LeasingDetail", "LeasingDetail")
+                    b.HasOne("LeasingCore.Models.Leasing", "Leasing")
                         .WithMany("Reports")
-                        .HasForeignKey("LeasingDetailId")
+                        .HasForeignKey("LeasingId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("LeasingCore.Models.Status", "Status")

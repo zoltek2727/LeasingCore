@@ -22,9 +22,7 @@ body {
 .carousel-inner .item img[src$=".svg"] {
     width: 100%;
 }
-.item img-responsive{
-    max-height:300px;
-}
+
 /* QR code generator */
 #qrCode {
     margin: 15px;
