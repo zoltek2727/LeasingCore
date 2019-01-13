@@ -30,7 +30,7 @@ namespace LeasingCore.Controllers
 
         // GET: Cart
         [Authorize]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var cart = SessionHelper.GetObjectFromJson<List<ShoppingCart>>(HttpContext.Session, "cart");
             ViewBag.cart = cart;
@@ -43,11 +43,10 @@ namespace LeasingCore.Controllers
                                                     .ThenInclude(p => p.Photo)
                                                 .Include(p => p.ProductAssortments)
                                                     .ThenInclude(a => a.Assortment)
-                                                        .ThenInclude(p => p.Param)
-                                                .AsQueryable();
+                                                        .ThenInclude(p => p.Param);
 
                 ViewBag.total = cart.Sum(item => item.Product.ProductPrice * item.Quantity);
-                return View(products);
+                return View(await products.ToListAsync());
             }
 
             return View();

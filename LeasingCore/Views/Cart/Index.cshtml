@@ -29,60 +29,61 @@
 
                         @foreach (var item in ViewBag.cart)
                         {
-                            <tr>
-                                <td class="col-sm-8 col-md-6">
-                                    <div class="media">
-                                        @foreach (var photo in Model.Where(x => x.ProductId == item.Product.ProductId))
+                        <tr>
+                            <td class="col-sm-8 col-md-6">
+                                <div class="media">
+                                    @foreach (var photo in Model.Where(x => x.ProductId == item.Product.ProductId))
+                                    {
+                                        @if (photo.PhotoProducts.Count > 1)
                                         {
-                                            @if (photo.PhotoProducts.Count > 1)
+                                            @foreach (var photo2 in photo.PhotoProducts.Where(p => p.ProductId == item.Product.ProductId))
                                             {
-                                                @foreach (var photo2 in photo.PhotoProducts.Where(p => p.ProductId == item.Product.ProductId))
+                                                @if (photo2.PhotoProductIsDefault)
                                                 {
-                                                    @if (photo2.PhotoProductIsDefault)
-                                                    {
-                                                        <a class="thumbnail pull-left" href="#"> <img class="media-object" src="@photo2.Photo.PhotoUrl" style="width: 72px; height: 72px;"> </a>
-                                                    }
+                                                    <a class="thumbnail pull-left" href="#"> <img class="media-object" src="@photo2.Photo.PhotoUrl" style="width: 72px; height: 72px;"> </a>
                                                 }
                                             }
-                                            else
-                                            {
-                                                <a class="thumbnail pull-left" href="#"> <img class="media-object" src="~/images/emptyProduct.jpg" style="width: 72px; height: 72px;"> </a>
-                                            }
                                         }
-                                        <div class="media-body">
-                                            <h4 class="media-heading"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h4>
-                                            <h5 class="media-heading"> code <b>@item.Product.ProductCode</b></h5>
-                                        </div>
+                                        else
+                                        {
+                                            <a class="thumbnail pull-left" href="#"> <img class="media-object" src="~/images/emptyProduct.jpg" style="width: 72px; height: 72px;"> </a>
+                                        }
+                                    }
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h4>
+                                        <h5 class="media-heading"> code <b>@item.Product.ProductCode</b></h5>
                                     </div>
-                                </td>
-                                <td class="col-sm-1 col-md-1" style="text-align: center">
-                                    <input id="@item.Product.ProductId" type="number" min="1" step="1" max="@item.Product.ProductAvailability" value="@item.Quantity" class="form-control" /> from @item.Product.ProductAvailability
-                                </td>
-                                <td class="col-sm-2 col-md-2 text-center">
-                                    <strong id="onePrice">
-                                        @{
-                                            decimal total = 0;
+                                </div>
+                            </td>
+                            <td class="col-sm-1 col-md-1" style="text-align: center">
+                                @*<input id="@item.Product.ProductId" type="number" min="1" step="1" max="@item.Product.ProductAvailability" value="@item.Quantity" class="form-control" /> from @item.Product.ProductAvailability*@
+                                <span>@item.Quantity</span>
+                            </td>
+                            <td class="col-sm-2 col-md-2 text-center">
+                                <strong id="onePrice">
+                                    @{
+                                        decimal total = 0;
 
-                                            total += item.Product.ProductPrice;
+                                        total += item.Product.ProductPrice;
 
-                                            foreach (var param in Model.Where(p => p.ProductId == item.Product.ProductId))
+                                        foreach (var param in Model.Where(p => p.ProductId == item.Product.ProductId))
+                                        {
+                                            @foreach (var paramTotal in param.ProductAssortments.Where(p => p.ProductId == item.Product.ProductId))
                                             {
-                                                @foreach (var paramTotal in param.ProductAssortments.Where(p => p.ProductId == item.Product.ProductId))
-                                                {
-                                                    total += paramTotal.Assortment.AssortmentPrice;
-                                                }
+                                                total += paramTotal.Assortment.AssortmentPrice;
                                             }
                                         }
-                                        @total PLN
-                                    </strong>
-                                </td>
-                                <td class="col-sm-2 col-md-2 text-center"><strong id="@item.Product.ProductId">@(total * item.Quantity) PLN</strong></td>
-                                <td class="col-sm-2 col-md-2">
-                                    <a class="btn btn-danger" asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">
-                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                                    </a>
-                                </td>
-                            </tr>
+                                    }
+                                    @total PLN
+                                </strong>
+                            </td>
+                            <td class="col-sm-2 col-md-2 text-center"><strong id="@item.Product.ProductId">@(total * item.Quantity) PLN</strong></td>
+                            <td class="col-sm-2 col-md-2">
+                                <a class="btn btn-danger" asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Product.ProductId">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                                </a>
+                            </td>
+                        </tr>
                                                 totalSum += total * item.Quantity;
                                             }
                         <tr>

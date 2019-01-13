@@ -8,6 +8,7 @@ using LeasingCore.Models;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LeasingCore.Controllers
 {
@@ -107,18 +108,21 @@ namespace LeasingCore.Controllers
             return View(products);
         }
 
+        [Authorize]
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
             return View();
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,ProductAdded,CategoryId")] Product products)
         {
             if (ModelState.IsValid)
             {
+                products.ProductAdded = DateTime.Now;
                 _context.Add(products);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -126,7 +130,7 @@ namespace LeasingCore.Controllers
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", products.CategoryId);
             return View(products);
         }
-
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -141,7 +145,7 @@ namespace LeasingCore.Controllers
             }
             return View(products);
         }
-
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductPrice,ProductAvailability,ProductCode,ProductAdded,CategoryId")] Product products)
@@ -173,7 +177,7 @@ namespace LeasingCore.Controllers
             }
             return View(products);
         }
-
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -190,7 +194,7 @@ namespace LeasingCore.Controllers
 
             return View(products);
         }
-
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
