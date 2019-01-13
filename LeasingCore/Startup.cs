@@ -36,8 +36,9 @@ namespace LeasingCore
             });
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=LeasingDB;Trusted_Connection=True;"));
+            //options.UseSqlServer(
+            //    Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<ApplicationUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();

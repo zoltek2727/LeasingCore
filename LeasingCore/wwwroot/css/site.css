@@ -65,3 +65,13 @@ li.dropdown:hover > .dropdown-menu {
     display: inline-block;
     margin-top: 20px;
 }
+
+.miniaturka {
+    background-color: white;
+    opacity: 0.9;
+}
+
+.miniaturka:hover {
+    opacity: 1;
+}
+
