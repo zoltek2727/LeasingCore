@@ -26,6 +26,7 @@ namespace LeasingCore.Controllers
                 Orientation = Orientation.Portrait,
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings { Top = 10 },
+
                 DocumentTitle = "PDF Report"+DateTime.Now+"",
                 Out = @"C:\PDF\Leasing.pdf"
             };
